@@ -6,7 +6,8 @@ import (
 	"server_elearn/auth"
 	"server_elearn/handler"
 	"server_elearn/helper"
-	"server_elearn/user"
+	"server_elearn/repository"
+	"server_elearn/service"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -31,9 +32,9 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	userRepository := user.NewRepository(db)
+	userRepository := repository.NewUserRepository(db)
 
-	userService := user.NewService(userRepository)
+	userService := service.NewUserService(userRepository)
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
@@ -61,7 +62,7 @@ func main() {
 
 }
 
-func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+func authMiddleware(authService auth.Service, userService service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server_elearn/auth"
 	"server_elearn/helper"
+	"server_elearn/models/users"
 	"server_elearn/service"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	// map input dari user ke struct RegisterUserInput
 	// struct di atas kita passing sebagai parameter service 
 
-	var input user.RegisterUserInput
+	var input users.RegisterUserInput
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
 		errors := helper.FormatValidationError(err)
@@ -46,7 +47,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return	
 	}
-	formatter := user.FormatUser(newUser, token)
+	formatter := users.FormatUser(newUser, token)
 	response := helper.APIResponse("Accout has been register", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 
@@ -60,7 +61,7 @@ func (h *userHandler) Login(c *gin.Context) {
 	// di service mencari dg bantuan rpository user dengan email
 	// mencocokan password
 
-	var input user.LoginInput
+	var input users.LoginInput
 	
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -89,7 +90,7 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(loggedinUser, token)
+	formatter := users.FormatUser(loggedinUser, token)
 
 	response := helper.APIResponse("Succesfullt Loggedin", http.StatusOK,"success", formatter)
 
@@ -98,7 +99,7 @@ func (h *userHandler) Login(c *gin.Context) {
 }
 
 func (h *userHandler) CheckEmailAvaibility(c *gin.Context){
-	var input user.CheckEmailInput
+	var input users.CheckEmailInput
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -142,7 +143,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return 
 	}
 
-	currentUser := c.MustGet("currentUser").(user.User)
+	currentUser := c.MustGet("currentUser").(users.User)
 	userID := currentUser.ID
 
 	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
@@ -173,9 +174,9 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 
 func (h *userHandler) FetchUser(c *gin.Context){
 
-	currentUser := c.MustGet("currentUser").(user.User)
+	currentUser := c.MustGet("currentUser").(users.User)
 
-	formatter := user.FormatUser(currentUser, "")
+	formatter := users.FormatUser(currentUser, "")
 
 	response := helper.APIResponse("Succesfully fetch user data", http.StatusOK, "success", formatter)
 
