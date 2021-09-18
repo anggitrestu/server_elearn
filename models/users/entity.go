@@ -1,9 +1,9 @@
-package user
+package users
 
 import "time"
 
 type User struct {
-	ID             int
+	ID             int 
 	Name           string
 	Occupation     string
 	Email          string

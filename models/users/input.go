@@ -1,4 +1,4 @@
-package user
+package users
 
 // mewakili apa yang diinputkan oleh user
 type RegisterUserInput struct {

@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"server_elearn/auth"
 	"server_elearn/helper"
-	"server_elearn/user"
+	"server_elearn/service"
 
 	"github.com/gin-gonic/gin"
 )
 type userHandler struct {
-	userService user.Service
+	userService service.UserService
 	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+func NewUserHandler(userService service.UserService, authService auth.Service) *userHandler {
 	return &userHandler{userService, authService}
 }
 

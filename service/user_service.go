@@ -1,34 +1,36 @@
-package user
+package service
 
 // controller
 
 import (
 	"errors"
+	"server_elearn/models/users"
+	"server_elearn/repository"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 // membuat mapping dari struct input ke struct user
 // mewakili binis logic, kata kerja
-type Service interface {
-	RegisterUser(input RegisterUserInput) (User, error)
-	Login(input LoginInput)(User, error)
-	IsEmailAvailable(input CheckEmailInput)(bool, error)
-	SaveAvatar(ID int, fileLocation string)(User, error)
-	GetUserByID(ID int)(User, error)
+type UserService interface {
+	RegisterUser(input users.RegisterUserInput) (users.User, error)
+	Login(input users.LoginInput)(users.User, error)
+	IsEmailAvailable(input users.CheckEmailInput)(bool, error)
+	SaveAvatar(ID int, fileLocation string)(users.User, error)
+	GetUserByID(ID int)(users.User, error)
 }
 
-type service struct {
-	repository Repository
+type userService struct {
+	repository repository.UserRepository
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewUserService(repository repository.UserRepository) *userService {
+	return &userService{repository}
 }
 
-func(s *service) RegisterUser(input RegisterUserInput)(User, error){
+func(s *userService) RegisterUser(input users.RegisterUserInput)(users.User, error){
 	// s.repository.Save(user)
-	user := User{}
+	user := users.User{}
 	user.Name = input.Name
 	user.Email  = input.Email
 	user.Occupation = input.Occupation
@@ -49,7 +51,7 @@ func(s *service) RegisterUser(input RegisterUserInput)(User, error){
 	return newUser, nil
 }
 
-func (s *service) Login(input LoginInput) (User, error) {
+func (s *userService) Login(input users.LoginInput) (users.User, error) {
 	email := input.Email
 	password := input.Password
 
@@ -71,7 +73,7 @@ func (s *service) Login(input LoginInput) (User, error) {
 
 }
 
-func (s *service) IsEmailAvailable(input CheckEmailInput)(bool, error){
+func (s *userService) IsEmailAvailable(input users.CheckEmailInput)(bool, error){
 	email := input.Email
 
 	user, err := s.repository.FindByEmail(email)
@@ -88,7 +90,7 @@ func (s *service) IsEmailAvailable(input CheckEmailInput)(bool, error){
 }
 
 
-func (s *service) SaveAvatar(ID int, fileLocation string)(User, error) {
+func (s *userService) SaveAvatar(ID int, fileLocation string)(users.User, error) {
 	user, err := s.repository.FindById(ID)
 	
 	if err != nil {
@@ -107,7 +109,7 @@ func (s *service) SaveAvatar(ID int, fileLocation string)(User, error) {
 
 }
 
-func(s *service) GetUserByID(ID int)(User, error) {
+func(s *userService) GetUserByID(ID int)(users.User, error) {
 	user, err := s.repository.FindById(ID)
 	if err != nil {
 		return user, err

@@ -1,4 +1,4 @@
-package user
+package users
 
 type UserFormatter struct {
 	ID         int    `json:"id"`
