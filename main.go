@@ -6,6 +6,7 @@ import (
 	"server_elearn/auth"
 	"server_elearn/handler"
 	"server_elearn/helper"
+	"server_elearn/models/users"
 	"server_elearn/repository"
 	"server_elearn/service"
 	"strings"
@@ -16,51 +17,38 @@ import (
 	"gorm.io/gorm"
 )
 
-// input dari users
-// handler mapping input dari user ke struct input
-// service mapping ke struct input ke struct user
-// repository save struct ke db
-// db
-
-
-
 func main() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/server_startup?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:root@tcp(127.0.0.1:3306)/server_elearn?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	db.AutoMigrate(&users.User{})
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	userRepository := repository.NewUserRepository(db)
-
 	userService := service.NewUserService(userRepository)
 	authService := auth.NewService()
-
 	userHandler := handler.NewUserHandler(userService, authService)
-
+	
 	router := gin.Default()
 
 	api := router.Group("/api/v1")
-
+	
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvaibility)
 	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.GET("/users/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
-
+	
 	router.Run()
 
-	// userInput := user.RegisterUserInput{}
-	// userInput.Name = "Tes simpan dari servce"
-	// userInput.Email = "tes@gmail.com"
-	// userInput.Occupation = "Kuli Software"
-	// userInput.Password = "password"
-
-	// userService.RegisterUser(userInput)
-	
-
 }
+
+
+
+
 
 func authMiddleware(authService auth.Service, userService service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
