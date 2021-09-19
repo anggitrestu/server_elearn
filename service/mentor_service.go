@@ -65,7 +65,7 @@ func (s *serviceMentor) UpdateMentor(inputID mentors.GetMentorInput ,inputData m
 	}
 
 	mentor.Name = inputData.Name
-	mentor.Profile = inputData.Name
+	mentor.Profile = inputData.Profile
 	mentor.Profession = inputData.Profession
 	mentor.Email = inputData.Email
 

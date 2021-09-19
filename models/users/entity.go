@@ -13,7 +13,7 @@ type User struct {
 	PasswordHash   string			`gorm:"size:256" json:"password_hash"`
 	Profession     string			`gorm:"size:256" json:"profession"`
 	AvatarFileName string			`gorm:"size:256" json:"avatar_file_name"`
-	Role           string			`gorm:"size:256" json:"role"`
+	Role           string			`gorm:"size:256;type:enum('student', 'admin')" json:"role"`
 	CreatedAt      time.Time		`json:"created_at"`
 	UpdatedAt      time.Time		`json:"updated_at"`
 	DeletedAt 	   gorm.DeletedAt	`gorm:"index" json:"deleted_at"`

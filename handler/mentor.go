@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"server_elearn/helper"
 	"server_elearn/models/mentors"
@@ -32,7 +33,8 @@ func (h *mentorHandler) AddMentor(c *gin.Context) {
 
 	newMentor, err := h.serviceMentor.AddMentor(input)
 	if err != nil {
-		response := helper.APIResponse("Failed to add mentor", http.StatusBadRequest, "error", nil)
+		errors := err.Error()
+		response := helper.APIResponse(errors, http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -55,9 +57,17 @@ func (h *mentorHandler) GetMentor(c *gin.Context) {
 		return
 	}
 
+
+
 	mentorDetail , err := h.serviceMentor.GetMentorByID(input)
 	if err != nil {
 		response := helper.APIResponse("Failed to get mentor", http.StatusNotFound, "error", nil)
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
+	if mentorDetail.ID < 1 {
+		response := helper.APIResponse("Mentor Not Found", http.StatusNotFound, "error", nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
@@ -66,6 +76,7 @@ func (h *mentorHandler) GetMentor(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 
 }
+
 
 func (h *mentorHandler) GetListMentor(c *gin.Context){
 	
@@ -88,6 +99,18 @@ func (h *mentorHandler) UpdateMentor(c *gin.Context) {
 	if err != nil {
 		response := helper.APIResponse("Failed to update mentor", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	mentor , err := h.serviceMentor.GetMentorByID(inputID)
+	if err != nil || mentor.ID < 1 {
+		message := "Failed to get mentor"
+		if mentor.ID < 1 {
+			message = "mentor not found"
+		} 
+
+		response := helper.APIResponse(message, http.StatusNotFound, "error", nil)
+		c.JSON(http.StatusNotFound, response)
 		return
 	}
 
@@ -127,16 +150,25 @@ func (h *mentorHandler) DeleteMentor(c *gin.Context) {
 		return
 	}
 
+	mentor , err := h.serviceMentor.GetMentorByID(inputID)
+	if err != nil || mentor.ID < 1 {
+		message :=  "Failed to get mentor"
+		if mentor.ID < 1 {
+			message = "Mentor Not Found"
+		}
+		response := helper.APIResponse(message, http.StatusNotFound, "error", nil)
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
 	_, err = h.serviceMentor.DeleteMentor(inputID)
 	if err != nil {
 		response := helper.APIResponse("Failed to update mentor", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-
-	message := gin.H{"message":  "deleted",}
-
-	response := helper.APIResponse("Success delete mentor", http.StatusOK, "Success", message)
+	message := fmt.Sprintf("success delete mentor id : %d", inputID.ID)
+	response := helper.APIResponse(message, http.StatusOK, "Success", nil)
 	c.JSON(http.StatusOK, response)
 	
 

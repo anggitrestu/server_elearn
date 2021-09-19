@@ -132,6 +132,7 @@ func (h *userHandler) CheckEmailAvaibility(c *gin.Context){
 
 }
 
+
 func (h *userHandler) UploadAvatar(c *gin.Context) {
 
 	file, err := c.FormFile("avatar")
