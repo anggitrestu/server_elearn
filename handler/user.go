@@ -11,11 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 type userHandler struct {
-	userService service.UserService
+	userService service.ServiceUser
 	authService auth.Service
 }
 
-func NewUserHandler(userService service.UserService, authService auth.Service) *userHandler {
+func NewUserHandler(userService service.ServiceUser, authService auth.Service) *userHandler {
 	return &userHandler{userService, authService}
 }
 

@@ -6,6 +6,7 @@ import (
 	"server_elearn/auth"
 	"server_elearn/handler"
 	"server_elearn/helper"
+	"server_elearn/models/mentors"
 	"server_elearn/models/users"
 	"server_elearn/repository"
 	"server_elearn/service"
@@ -21,17 +22,23 @@ func main() {
 	dsn := "root:root@tcp(127.0.0.1:3306)/server_elearn?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
-	db.AutoMigrate(&users.User{})
+	db.AutoMigrate(&users.User{}, &mentors.Mentor{})
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	userRepository := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepository)
-	authService := auth.NewService()
-	userHandler := handler.NewUserHandler(userService, authService)
+	mentorRepository := repository.NewMentorRepository(db)
 	
+	userService := service.NewServiceUser(userRepository)
+	authService := auth.NewService()
+	mentorService := service.NewServiceMentor(mentorRepository)
+	
+	userHandler := handler.NewUserHandler(userService, authService)
+	mentorHandler := handler.NewMentorHandler(mentorService)
+
+
 	router := gin.Default()
 
 	api := router.Group("/api/v1")
@@ -41,6 +48,14 @@ func main() {
 	api.POST("/email_checkers", userHandler.CheckEmailAvaibility)
 	api.POST("/avatars",authMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.GET("/users/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
+
+	api.POST("/mentors", mentorHandler.AddMentor)
+	api.GET("/mentors/:id", mentorHandler.GetMentor)
+	api.GET("/mentors", mentorHandler.GetListMentor)
+	api.PUT("/mentors/:id", mentorHandler.UpdateMentor)
+	api.DELETE("/mentors/:id", mentorHandler.DeleteMentor)
+
+
 	
 	router.Run()
 
@@ -50,7 +65,7 @@ func main() {
 
 
 
-func authMiddleware(authService auth.Service, userService service.UserService) gin.HandlerFunc {
+func authMiddleware(authService auth.Service, userService service.ServiceUser) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 

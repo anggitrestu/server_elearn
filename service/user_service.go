@@ -12,7 +12,7 @@ import (
 
 // membuat mapping dari struct input ke struct user
 // mewakili binis logic, kata kerja
-type UserService interface {
+type ServiceUser interface {
 	RegisterUser(input users.RegisterUserInput) (users.User, error)
 	Login(input users.LoginInput)(users.User, error)
 	IsEmailAvailable(input users.CheckEmailInput)(bool, error)
@@ -20,15 +20,15 @@ type UserService interface {
 	GetUserByID(ID int)(users.User, error)
 }
 
-type userService struct {
+type serviceUser struct {
 	repository repository.UserRepository
 }
 
-func NewUserService(repository repository.UserRepository) *userService {
-	return &userService{repository}
+func NewServiceUser(repository repository.UserRepository) *serviceUser {
+	return &serviceUser{repository}
 }
 
-func(s *userService) RegisterUser(input users.RegisterUserInput)(users.User, error){
+func(s *serviceUser) RegisterUser(input users.RegisterUserInput)(users.User, error){
 	// s.repository.Save(user)
 	user := users.User{}
 	user.Name = input.Name
@@ -51,7 +51,7 @@ func(s *userService) RegisterUser(input users.RegisterUserInput)(users.User, err
 	return newUser, nil
 }
 
-func (s *userService) Login(input users.LoginInput) (users.User, error) {
+func (s *serviceUser) Login(input users.LoginInput) (users.User, error) {
 	email := input.Email
 	password := input.Password
 
@@ -73,7 +73,7 @@ func (s *userService) Login(input users.LoginInput) (users.User, error) {
 
 }
 
-func (s *userService) IsEmailAvailable(input users.CheckEmailInput)(bool, error){
+func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error){
 	email := input.Email
 
 	user, err := s.repository.FindByEmail(email)
@@ -90,7 +90,7 @@ func (s *userService) IsEmailAvailable(input users.CheckEmailInput)(bool, error)
 }
 
 
-func (s *userService) SaveAvatar(ID int, fileLocation string)(users.User, error) {
+func (s *serviceUser) SaveAvatar(ID int, fileLocation string)(users.User, error) {
 	user, err := s.repository.FindById(ID)
 	
 	if err != nil {
@@ -109,7 +109,7 @@ func (s *userService) SaveAvatar(ID int, fileLocation string)(users.User, error)
 
 }
 
-func(s *userService) GetUserByID(ID int)(users.User, error) {
+func(s *serviceUser) GetUserByID(ID int)(users.User, error) {
 	user, err := s.repository.FindById(ID)
 	if err != nil {
 		return user, err
