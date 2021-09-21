@@ -10,7 +10,7 @@ type User struct {
 	ID             int 				`gorm:"primaryKey" json:"id"`
 	Name           string			`gorm:"size:256" json:"name"`
 	Email          string			`gorm:"unique" json:"email"`
-	Password   string				`gorm:"size:256" json:"password"`
+	Password       string			`gorm:"size:256" json:"password"`
 	Profession     string			`gorm:"size:256" json:"profession"`
 	AvatarFileName string			`gorm:"size:256" json:"avatar_file_name"`
 	Role           string			`gorm:"size:256;type:enum('student', 'admin')" json:"role"`

@@ -11,6 +11,8 @@ type ServiceMentor interface {
 	GetListMentor()([]mentors.Mentor, error)
 	UpdateMentor(inputID mentors.GetMentorInput ,inputData mentors.AddMentorInput)(mentors.Mentor, error)
 	DeleteMentor(inputID mentors.GetMentorInput)(mentors.Mentor, error)
+	MentorIsAvaibility(mentorID int)(bool, error)
+
 }
 
 type serviceMentor struct {
@@ -85,4 +87,19 @@ func (s *serviceMentor) DeleteMentor(inputID mentors.GetMentorInput)(mentors.Men
 	}
 
 	return mentor, nil
+}
+
+func (s *serviceMentor) MentorIsAvaibility(mentorID int)(bool, error){
+
+	mentor, err := s.repositoryMentor.CheckMentorByID(mentorID)
+	if err != nil {
+		return false, err
+	}
+
+	if mentor.ID == 0 {
+		return false, nil
+	}
+
+	return true, nil
+
 }

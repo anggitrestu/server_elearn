@@ -80,6 +80,7 @@ func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error)
 	if err != nil {
 		return false, err
 	}
+
 	
 	if user.ID == 0 {
 		return true, nil
