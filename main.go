@@ -29,15 +29,17 @@ func main() {
 
 	userRepository := repository.NewUserRepository(db)
 	mentorRepository := repository.NewMentorRepository(db)
-	
+	courseRepository := repository.NewCourseRepository(db)
+
 	userService := service.NewServiceUser(userRepository)
 	authService := auth.NewService()
 	authMiddleware := auth.AuthMiddleware(authService, userService)
 	mentorService := service.NewServiceMentor(mentorRepository)
-	
+	courseService := service.NewServiceCourse(courseRepository)
+
 	userHandler := handler.NewUserHandler(userService, authService)
 	mentorHandler := handler.NewMentorHandler(mentorService)
-
+	courseHandler := handler.NewCourseHandler(courseService, mentorService)
 
 	router := gin.Default()
 
@@ -49,12 +51,17 @@ func main() {
 	api.POST("/avatars",authMiddleware, userHandler.UploadAvatar)
 	api.GET("/users/fetch", authMiddleware, userHandler.FetchUser)
 
-	api.POST("/mentors", mentorHandler.AddMentor)
+	api.POST("/mentors", authMiddleware, mentorHandler.AddMentor)
 	api.GET("/mentors/:id", mentorHandler.GetMentor)
 	api.GET("/mentors", authMiddleware, mentorHandler.GetListMentor)
-	api.PUT("/mentors/:id", mentorHandler.UpdateMentor)
-	api.DELETE("/mentors/:id", mentorHandler.DeleteMentor)
+	api.PUT("/mentors/:id",authMiddleware, mentorHandler.UpdateMentor)
+	api.DELETE("/mentors/:id",authMiddleware, mentorHandler.DeleteMentor)
 
+	api.POST("/courses",authMiddleware, courseHandler.CreateCourse)
+	api.GET("/courses/:id", courseHandler.GetCourse)
+	api.GET("/courses", courseHandler.GetCourses)
+	api.PUT("/courses/:id",authMiddleware, courseHandler.UpdateCourse)
+	api.DELETE("/courses/:id", authMiddleware, courseHandler.DeleteCourse)
 
 	
 	router.Run()

@@ -30,7 +30,7 @@ func (r *userRepository)Save(user users.User)(users.User, error)  {
 		return user, err
 	}
 	
-	return user, nil
+	return user, nil	
 
 }
 
@@ -80,5 +80,7 @@ func(r *userRepository) FindAll()([]users.User, error){
 	return users, nil
 
 }
+
+
 
 

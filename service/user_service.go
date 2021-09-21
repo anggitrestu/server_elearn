@@ -34,13 +34,13 @@ func(s *serviceUser) RegisterUser(input users.RegisterUserInput)(users.User, err
 	user.Name = input.Name
 	user.Email  = input.Email
 	user.Profession = input.Profession
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
+	password, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	
 	if err != nil {
 		return user, err
 	}
-	user.PasswordHash = string(passwordHash)
-	user.Role = "user"
+	user.Password = string(password)
+	user.Role = "student"
 	
 	newUser, err := s.repository.Save(user)
 
@@ -64,7 +64,7 @@ func (s *serviceUser) Login(input users.LoginInput) (users.User, error) {
 		return user, errors.New("no user found on that email")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return user, err
 	}
@@ -80,6 +80,7 @@ func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error)
 	if err != nil {
 		return false, err
 	}
+
 	
 	if user.ID == 0 {
 		return true, nil

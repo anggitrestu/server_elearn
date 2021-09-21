@@ -12,6 +12,7 @@ type MentorRepository interface {
 	FindAll() ([]mentors.Mentor, error)
 	Update(mentor mentors.Mentor)(mentors.Mentor, error)
 	Delete(ID int)(mentors.Mentor, error)
+	CheckMentorByID(mentorID int)(mentors.Mentor, error)
 }
 
 type mentorRepository struct {
@@ -68,6 +69,16 @@ func (r *mentorRepository)Update(mentor mentors.Mentor)(mentors.Mentor, error){
 func (r *mentorRepository) Delete(ID int)(mentors.Mentor, error) {
 	mentor := mentors.Mentor{}
 	err := r.db.Where("id = ?", ID).Delete(&mentor).Error
+	if err != nil {
+		return mentor, err
+	}
+
+	return mentor, nil
+}
+
+func(r *mentorRepository)CheckMentorByID(mentorID int)(mentors.Mentor, error) {
+	var mentor mentors.Mentor
+	err := r.db.Where("id = ?", mentorID).Find(&mentor).Error
 	if err != nil {
 		return mentor, err
 	}

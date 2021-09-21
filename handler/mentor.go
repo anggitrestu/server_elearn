@@ -17,7 +17,7 @@ type mentorHandler struct {
 func NewMentorHandler(serviceMentor service.ServiceMentor)*mentorHandler {
 	return &mentorHandler{serviceMentor}
 }
-
+ 
 func (h *mentorHandler) AddMentor(c *gin.Context) {
 	var input mentors.AddMentorInput
 
@@ -163,13 +163,13 @@ func (h *mentorHandler) DeleteMentor(c *gin.Context) {
 
 	_, err = h.serviceMentor.DeleteMentor(inputID)
 	if err != nil {
-		response := helper.APIResponse("Failed to update mentor", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponse("Failed to delete mentor", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+	
 	message := fmt.Sprintf("success delete mentor id : %d", inputID.ID)
 	response := helper.APIResponse(message, http.StatusOK, "Success", nil)
 	c.JSON(http.StatusOK, response)
 	
-
 }
