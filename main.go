@@ -30,16 +30,19 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	mentorRepository := repository.NewMentorRepository(db)
 	courseRepository := repository.NewCourseRepository(db)
+	chapterRepository := repository.NewChapterRepository(db)
 
 	userService := service.NewServiceUser(userRepository)
 	authService := auth.NewService()
 	authMiddleware := auth.AuthMiddleware(authService, userService)
 	mentorService := service.NewServiceMentor(mentorRepository)
 	courseService := service.NewServiceCourse(courseRepository)
+	chapterService := service.NewServiceChapter(chapterRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	mentorHandler := handler.NewMentorHandler(mentorService)
 	courseHandler := handler.NewCourseHandler(courseService, mentorService)
+	chapterHandler := handler.NewChapterHandler(chapterService, courseService)
 
 	router := gin.Default()
 
@@ -63,6 +66,11 @@ func main() {
 	api.PUT("/courses/:id",authMiddleware, courseHandler.UpdateCourse)
 	api.DELETE("/courses/:id", authMiddleware, courseHandler.DeleteCourse)
 
+	api.POST("/chapters", chapterHandler.CreateChapter)
+	api.GET("/chapters/:id", chapterHandler.GetChapter)
+	api.GET("/chapters", chapterHandler.GetChapters)
+	api.PUT("/chapters/:id", chapterHandler.UpdateChapter)
+	api.DELETE("/chapters/:id", chapterHandler.DeleteChapter)
 	
 	router.Run()
 
