@@ -11,13 +11,14 @@ type ServiceCourse interface {
 	GetCourses()([]courses.Course, error)
 	UpdateCourse(inputID courses.GetCourseInput, inputData courses.CreateCourseInput)(courses.Course, error)
 	DeleteCourse(inputID courses.GetCourseInput)(courses.Course, error)
+	CourseIsAvaibility(coursesID int)(bool, error)
 }
 
 type serviceCourse struct {
 	repositoryCourse repository.CourseRepository
 }
 
-func NewServiceCourse(repositoryCourse repository.CourseRepository)*serviceCourse {
+func NewServiceCourse(repositoryCourse repository.CourseRepository) *serviceCourse {
 	return &serviceCourse{repositoryCourse}
 }
 
@@ -90,5 +91,18 @@ func(s *serviceCourse) DeleteCourse(inputID courses.GetCourseInput)(courses.Cour
 	return course, nil
 }
 
+
+func(s *serviceCourse) CourseIsAvaibility(coursesID int)(bool, error) {
+	course, err := s.repositoryCourse.FindByCourseID(coursesID)
+	if err != nil {
+		return false, err
+	}
+
+	if course.ID == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
 
 

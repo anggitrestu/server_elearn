@@ -12,7 +12,7 @@ type CourseRepository interface {
 	FindAll()([]courses.Course, error)
 	Update(course courses.Course)(courses.Course, error)
 	Delete(ID int)(courses.Course, error)
-
+ 	FindByCourseID(ID int)(courses.Course, error)
 }
 
 type courseRepository struct {
@@ -66,6 +66,17 @@ func(r *courseRepository) FindAll()([]courses.Course, error){
 func (r *courseRepository) Delete(ID int)(courses.Course, error) {
 	course := courses.Course{}
 	err := r.db.Where("id = ?", ID).Delete(&course).Error
+	if err != nil {
+		return course, err
+	}
+
+	return course, nil
+}
+
+func (r *courseRepository) FindByCourseID(ID int)(courses.Course, error) {
+
+	var course courses.Course
+	err := r.db.Where("id = ?", ID).Find(&course).Error
 	if err != nil {
 		return course, err
 	}
