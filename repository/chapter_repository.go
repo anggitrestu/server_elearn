@@ -13,6 +13,7 @@ type ChapterRepository interface {
 	FindAll()([]chapters.Chapter,error)
 	Update(chapter chapters.Chapter)(chapters.Chapter, error)
 	Delete(ID int)(bool, error)
+	CheckChapterByID(chapterID int)(chapters.Chapter, error)
 }
 
 type chapterRepository struct {
@@ -81,4 +82,14 @@ func(r *chapterRepository) Delete(ID int)(bool, error) {
 	}
 
 	return true, nil
+}
+
+func(r *chapterRepository) CheckChapterByID(chapterID int)(chapters.Chapter, error) {
+	var chapter chapters.Chapter
+	err := r.db.Where("id = ?", chapterID).Find(&chapter).Error
+	if err != nil {
+		return chapter, err
+	}
+
+	return chapter, nil
 }

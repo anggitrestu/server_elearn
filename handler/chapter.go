@@ -19,7 +19,7 @@ type chapterHandler struct {
 func NewChapterHandler(serviceChapter service.ServiceChapter, serviceCourse service.ServiceCourse)*chapterHandler {
 	return &chapterHandler{serviceChapter, serviceCourse}
 }
-
+	
 
 func(h *chapterHandler) CreateChapter(c *gin.Context) {
 
@@ -111,7 +111,7 @@ func(h *chapterHandler)UpdateChapter(c *gin.Context){
 
 	chapter , err := h.serviceChapter.GetChapter(inputID)
 	if err != nil || chapter.ID < 1 {
-		message := "Failed to get chapter"
+		message := "Failed get chapter"
 		if chapter.ID < 1 {
 			message = "chapter not found"
 		} 

@@ -11,6 +11,7 @@ type ServiceChapter interface {
 	 GetChapters(courseID int)([]chapters.Chapter, error)
 	 UpdateChapter(inputID chapters.GetChapterInput, inputData chapters.UpdateChapterInput)(chapters.Chapter, error)
 	 DeleteChapter(inputID chapters.GetChapterInput)(bool, error)
+	 ChapterIsAvaibility(chapterID int)(bool, error)
 }
 
 type serviceChapter struct {
@@ -84,4 +85,19 @@ func (s *serviceChapter) DeleteChapter(inputID chapters.GetChapterInput)(bool, e
 		return false, err
 	}
 	return true, nil
+}
+
+func (s *serviceChapter) ChapterIsAvaibility(chapterID int)(bool, error){
+
+	chapter, err := s.repositoryChapter.CheckChapterByID(chapterID)
+	if err != nil {
+		return false, err
+	}
+
+	if chapter.ID == 0 {
+		return false, nil
+	}
+
+	return true, nil
+
 }
