@@ -2,6 +2,10 @@ package courses
 
 import (
 	"server_elearn/models/chapters"
+	imagecourses "server_elearn/models/image_courses"
+	"server_elearn/models/mycourses"
+	"server_elearn/models/orders"
+	"server_elearn/models/reviews"
 	"time"
 
 	"gorm.io/gorm"
@@ -22,6 +26,11 @@ type Course struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	Chapter 	[]chapters.Chapter `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Chapters 	[]chapters.Chapter `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	MyCourses 	[]mycourses.MyCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`	
+	ImageCourses []imagecourses.ImageCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`	
+	Reviews 	[]reviews.Review `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Orders			[]orders.Order `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+
 }
 

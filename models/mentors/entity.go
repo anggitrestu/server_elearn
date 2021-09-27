@@ -17,5 +17,5 @@ type Mentor struct {
 	CreatedAt      	time.Time		`json:"created_at"`
 	UpdatedAt      	time.Time		`json:"updated_at"`
 	DeletedAt 	   	gorm.DeletedAt	`gorm:"index" json:"deleted_at"`
-	Course 			[]courses.Course `gorm:"foreignKey:MentorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Courses 		[]courses.Course `gorm:"foreignKey:MentorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
