@@ -11,7 +11,7 @@ type Review struct {
 	CourseID  int            `json:"course_id"`
 	UserID    int            `json:"user_id"`
 	Rating 		int 		  `json:"rating"`
-	Note 		int 		  `json:"note"`
+	Note 		string 		  `json:"note"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`

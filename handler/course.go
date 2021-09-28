@@ -127,7 +127,7 @@ func(h *courseHandler) UpdateCourse(c *gin.Context){
 	}
 
 	var inputData courses.CreateCourseInput
-	c.ShouldBindJSON(&inputData)
+	err = c.ShouldBindJSON(&inputData)
 	if err != nil {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}

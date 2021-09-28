@@ -38,6 +38,7 @@ func main() {
 	chapterRepository := repository.NewChapterRepository(db)
 	lessonRepository := repository.NewLessonRepository(db)
 	imageCourseRepository := repository.NewImageCourseRepository(db)
+	reviewRepository := repository.NewReviewRepository(db)
 
 	userService := service.NewServiceUser(userRepository)
 	authService := auth.NewService()
@@ -47,6 +48,7 @@ func main() {
 	chapterService := service.NewServiceChapter(chapterRepository)
 	lessonService := service.NewServiceLesson(lessonRepository)
 	imageCourseService := service.NewServiceImageCourse(imageCourseRepository)
+	reviewService := service.NewServiceReview(reviewRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	mentorHandler := handler.NewMentorHandler(mentorService)
@@ -54,6 +56,7 @@ func main() {
 	chapterHandler := handler.NewChapterHandler(chapterService, courseService)
 	lessonHandler := handler.NewLessonHandler(lessonService)
 	imageCourseHandler := handler.NewImageCourseHandler(imageCourseService, courseService)
+	reviewHandler := handler.NewReviewHandler(reviewService, courseService)
 
 	router := gin.Default()
 
@@ -62,7 +65,7 @@ func main() {
 	api.POST("/users/register", userHandler.RegisterUser)
 	api.POST("/users/login", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvaibility)
-	api.POST("/avatars",authMiddleware, userHandler.UploadAvatar)
+	api.POST("/avatars", authMiddleware, userHandler.UploadAvatar)
 	api.GET("/users/fetch", authMiddleware, userHandler.FetchUser)
 
 	api.POST("/mentors", authMiddleware, mentorHandler.AddMentor)
@@ -73,26 +76,28 @@ func main() {
 
 	api.POST("/courses",authMiddleware, courseHandler.CreateCourse)
 	api.GET("/courses/:id", courseHandler.GetCourse)
-	api.GET("/courses", courseHandler.GetCourses)
+	api.GET("/courses",authMiddleware, courseHandler.GetCourses)
 	api.PUT("/courses/:id",authMiddleware, courseHandler.UpdateCourse)
 	api.DELETE("/courses/:id", authMiddleware, courseHandler.DeleteCourse)
 
-	api.POST("/chapters", chapterHandler.CreateChapter)
+	api.POST("/chapters", authMiddleware,chapterHandler.CreateChapter)
 	api.GET("/chapters/:id", chapterHandler.GetChapter)
 	api.GET("/chapters", chapterHandler.GetChapters)
-	api.PUT("/chapters/:id", chapterHandler.UpdateChapter)
-	api.DELETE("/chapters/:id", chapterHandler.DeleteChapter)
+	api.PUT("/chapters/:id",authMiddleware, chapterHandler.UpdateChapter)
+	api.DELETE("/chapters/:id", authMiddleware, chapterHandler.DeleteChapter)
 
-	api.POST("/lessons", lessonHandler.CreateLesson)
+	api.POST("/lessons",authMiddleware, lessonHandler.CreateLesson)
 	api.GET("/lessons/:id", lessonHandler.GetLesson)
 	api.GET("/lessons", lessonHandler.GetLessons)
-	api.PUT("/lessons/:id", lessonHandler.UpdateLesson)
-	api.DELETE("/lessons/:id", lessonHandler.DeleteLesson)
+	api.PUT("/lessons/:id",authMiddleware, lessonHandler.UpdateLesson)
+	api.DELETE("/lessons/:id",authMiddleware, lessonHandler.DeleteLesson)
 
-	api.POST("/image-courses", imageCourseHandler.CreateImageCourse)
-	api.DELETE("/image-courses/:id", imageCourseHandler.DeleteImageCourse)
+	api.POST("/image-courses",authMiddleware, imageCourseHandler.CreateImageCourse)
+	api.DELETE("/image-courses/:id", authMiddleware, imageCourseHandler.DeleteImageCourse)
 
-	
+	api.POST("/reviews", authMiddleware, reviewHandler.CreateReview)
+	api.PUT("/reviews/:id", authMiddleware, reviewHandler.UpdateReview)
+	api.DELETE("/reviews/:id", authMiddleware, reviewHandler.DeleteReview)
 	
 	router.Run()
 

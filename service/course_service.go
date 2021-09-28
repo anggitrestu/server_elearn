@@ -34,7 +34,7 @@ func(s *serviceCourse) CreateCourse(input courses.CreateCourseInput)(courses.Cou
 
 	newCourse, err := s.repositoryCourse.Save(course)
 	if err != nil {
-		return course, err
+		return newCourse, err
 	}
 
 	return newCourse, nil
