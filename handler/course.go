@@ -28,7 +28,7 @@ func(h *courseHandler) CreateCourse(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.APIResponse("Failed to create course", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.APIResponse("Failed create course", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -86,7 +86,7 @@ func (h *courseHandler) GetCourse(c *gin.Context) {
 		return
 	}
 	
-	response := helper.APIResponse("Success to get detail course", http.StatusOK, "success", courses.FormatCourse(detailCourse))
+	response := helper.APIResponse("Success to get detail course", http.StatusOK, "success", detailCourse)
 	c.JSON(http.StatusOK, response)
 
 }
@@ -127,7 +127,7 @@ func(h *courseHandler) UpdateCourse(c *gin.Context){
 	}
 
 	var inputData courses.CreateCourseInput
-	c.ShouldBindJSON(&inputData)
+	err = c.ShouldBindJSON(&inputData)
 	if err != nil {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
@@ -153,13 +153,13 @@ func(h *courseHandler) DeleteCourse(c *gin.Context){
 	var inputID courses.GetCourseInput
 	err := c.ShouldBindUri(&inputID)
 	if err != nil {
-		response := helper.APIResponse("Failed to delete mentor", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponse("Failed delete course", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	course, err := h.serviceCourses.GetCourseByID(inputID)
-		if err != nil || course.ID < 1 {
+	if err != nil || course.ID < 1 {
 		message :=  "Failed to get course"
 		if course.ID < 1 {
 			message = "course Not Found"

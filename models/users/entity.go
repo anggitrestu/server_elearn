@@ -1,6 +1,9 @@
 package users
 
 import (
+	"server_elearn/models/mycourses"
+	"server_elearn/models/orders"
+	"server_elearn/models/reviews"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,4 +20,8 @@ type User struct {
 	CreatedAt      time.Time		`json:"created_at"`
 	UpdatedAt      time.Time		`json:"updated_at"`
 	DeletedAt 	   gorm.DeletedAt	`gorm:"index" json:"deleted_at"`
-}
+	MyCourses		[]mycourses.MyCourse	`gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Reviews 		[]reviews.Review `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Orders			[]orders.Order `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+
+}	

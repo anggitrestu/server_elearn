@@ -12,6 +12,7 @@ type ServiceCourse interface {
 	UpdateCourse(inputID courses.GetCourseInput, inputData courses.CreateCourseInput)(courses.Course, error)
 	DeleteCourse(inputID courses.GetCourseInput)(courses.Course, error)
 	CourseIsAvaibility(coursesID int)(bool, error)
+	GetCourseByCourseID(coursesID int)(courses.Course, error)
 }
 
 type serviceCourse struct {
@@ -34,7 +35,7 @@ func(s *serviceCourse) CreateCourse(input courses.CreateCourseInput)(courses.Cou
 
 	newCourse, err := s.repositoryCourse.Save(course)
 	if err != nil {
-		return course, err
+		return newCourse, err
 	}
 
 	return newCourse, nil
@@ -103,6 +104,15 @@ func(s *serviceCourse) CourseIsAvaibility(coursesID int)(bool, error) {
 	}
 
 	return true, nil
+}
+
+func(s *serviceCourse) GetCourseByCourseID(coursesID int)(courses.Course, error) {
+	course, err := s.repositoryCourse.FindByCourseID(coursesID)
+	if err != nil {
+		return course, err
+	}
+
+	return course, nil
 }
 
 

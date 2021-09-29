@@ -15,7 +15,7 @@ return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
 		if !strings.Contains(authHeader, "Bearer") {
-			response := helper.APIResponse("Unauthorized1", http.StatusUnauthorized, "error", nil)
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -28,7 +28,7 @@ return func(c *gin.Context) {
 
 		token, err := authService.ValidateToken(tokenString)
 		if err!=nil {
-			response := helper.APIResponse("Unauthorized2", http.StatusUnauthorized, "error", nil)
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -36,7 +36,7 @@ return func(c *gin.Context) {
 		claim, ok := token.Claims.(jwt.MapClaims)
 
 		if !ok || !token.Valid  {
-			response := helper.APIResponse("Unauthorized3", http.StatusUnauthorized, "error", nil)
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
@@ -44,7 +44,7 @@ return func(c *gin.Context) {
 		userID := int(claim["user_id"].(float64))
 		user, err := userService.GetUserByID(userID)
 		if err!=nil {
-			response := helper.APIResponse("Unauthorized4", http.StatusUnauthorized, "error", nil)
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}

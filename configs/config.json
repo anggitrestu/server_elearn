@@ -1,0 +1,9 @@
+{
+  "jwt": {
+    "SECRET_KEY": "!*!*!*ElE4RN"
+  },
+  "midtrans": {
+    "MIDTRANS_SERVER_KEY": "SB-Mid-server-m2OkDmszlvtFNFT6XDpW2dbA",
+    "MIDTRANS_CLIENT_KEY": "SB-Mid-client-t-V2YcQBWyf-JhN5"
+  }
+}
