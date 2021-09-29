@@ -1,7 +1,7 @@
 package courses
 
 type CreateCourseInput struct {
-	Name        string `json:"name"`
+	Name        string `json:"name" `
 	Certificate bool   `json:"certificate"`
 	Type        string `json:"type"`
 	Status      string `json:"status"`

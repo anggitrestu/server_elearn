@@ -40,6 +40,7 @@ func main() {
 	imageCourseRepository := repository.NewImageCourseRepository(db)
 	reviewRepository := repository.NewReviewRepository(db)
 	myCourseRepository := repository.NewMyCourseRepository(db)
+	orderRepository := repository.NewOrderRepository(db)
 
 	userService := service.NewServiceUser(userRepository)
 	authService := auth.NewService()
@@ -51,6 +52,8 @@ func main() {
 	imageCourseService := service.NewServiceImageCourse(imageCourseRepository)
 	reviewService := service.NewServiceReview(reviewRepository)
 	myCourseService := service.NewServiceMyCourse(myCourseRepository)
+	paymentService := service.NewServicePayment()
+	orderService := service.NewServiceOrder(orderRepository, *paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	mentorHandler := handler.NewMentorHandler(mentorService)
@@ -60,6 +63,7 @@ func main() {
 	imageCourseHandler := handler.NewImageCourseHandler(imageCourseService, courseService)
 	reviewHandler := handler.NewReviewHandler(reviewService, courseService)
 	myCourseHandler := handler.NewMyCourseHandler(myCourseService, courseService)
+	orderHandler := handler.NewOrderHandler(orderService)
 
 	router := gin.Default()
 
@@ -79,7 +83,7 @@ func main() {
 
 	api.POST("/courses",authMiddleware, courseHandler.CreateCourse)
 	api.GET("/courses/:id", courseHandler.GetCourse)
-	api.GET("/courses",authMiddleware, courseHandler.GetCourses)
+	api.GET("/courses", courseHandler.GetCourses)
 	api.PUT("/courses/:id",authMiddleware, courseHandler.UpdateCourse)
 	api.DELETE("/courses/:id", authMiddleware, courseHandler.DeleteCourse)
 
@@ -105,6 +109,11 @@ func main() {
 	api.POST("/my-courses", authMiddleware, myCourseHandler.CreateMyCourse)
 	api.GET("/my-courses", authMiddleware, myCourseHandler.GetAllMyCourse)
 	
+	api.POST("/order", authMiddleware,orderHandler.CreateOrder)
+	api.GET("/orders", authMiddleware,orderHandler.GetOrders)
+	api.POST("/webhook", orderHandler.Webhook)
+
+
 	router.Run()
 
 }

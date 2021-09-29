@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/spf13/viper"
 )
 
 type Service interface {
@@ -14,7 +15,7 @@ type Service interface {
 type jwtService struct {
 }
 
-var SECRET_KEY = []byte("ELEARN_s3cr3T_k3Y")
+var SECRET_KEY = []byte(viper.GetString("jwt.SECRET_KEY"))
 
 func NewService() *jwtService {
 	return &jwtService{}

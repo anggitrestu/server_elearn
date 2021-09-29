@@ -86,7 +86,7 @@ func (h *courseHandler) GetCourse(c *gin.Context) {
 		return
 	}
 	
-	response := helper.APIResponse("Success to get detail course", http.StatusOK, "success", courses.FormatCourse(detailCourse))
+	response := helper.APIResponse("Success to get detail course", http.StatusOK, "success", detailCourse)
 	c.JSON(http.StatusOK, response)
 
 }
