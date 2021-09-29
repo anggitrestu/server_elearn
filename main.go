@@ -39,6 +39,7 @@ func main() {
 	lessonRepository := repository.NewLessonRepository(db)
 	imageCourseRepository := repository.NewImageCourseRepository(db)
 	reviewRepository := repository.NewReviewRepository(db)
+	myCourseRepository := repository.NewMyCourseRepository(db)
 
 	userService := service.NewServiceUser(userRepository)
 	authService := auth.NewService()
@@ -49,6 +50,7 @@ func main() {
 	lessonService := service.NewServiceLesson(lessonRepository)
 	imageCourseService := service.NewServiceImageCourse(imageCourseRepository)
 	reviewService := service.NewServiceReview(reviewRepository)
+	myCourseService := service.NewServiceMyCourse(myCourseRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	mentorHandler := handler.NewMentorHandler(mentorService)
@@ -57,6 +59,7 @@ func main() {
 	lessonHandler := handler.NewLessonHandler(lessonService)
 	imageCourseHandler := handler.NewImageCourseHandler(imageCourseService, courseService)
 	reviewHandler := handler.NewReviewHandler(reviewService, courseService)
+	myCourseHandler := handler.NewMyCourseHandler(myCourseService, courseService)
 
 	router := gin.Default()
 
@@ -98,6 +101,9 @@ func main() {
 	api.POST("/reviews", authMiddleware, reviewHandler.CreateReview)
 	api.PUT("/reviews/:id", authMiddleware, reviewHandler.UpdateReview)
 	api.DELETE("/reviews/:id", authMiddleware, reviewHandler.DeleteReview)
+
+	api.POST("/my-courses", authMiddleware, myCourseHandler.CreateMyCourse)
+	api.GET("/my-courses", authMiddleware, myCourseHandler.GetAllMyCourse)
 	
 	router.Run()
 

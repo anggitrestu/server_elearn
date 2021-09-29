@@ -7,7 +7,8 @@ import (
 )
 
 type MyCourseRepository interface {
-	FindByID(ID int)(mycourses.MyCourse, error)
+	FindAllByUserID(userID int)([]mycourses.MyCourse, error)
+	CheckCourse(courseID int, userID int)(mycourses.MyCourse, error)
 	Save(myCourse mycourses.MyCourse)(mycourses.MyCourse, error)
 	// UpdateToPremium(mycou)
 }
@@ -20,9 +21,19 @@ func NewMyCourseRepository(db *gorm.DB) *myCourseRepository {
 	return &myCourseRepository{db}
 }
 
-func(r *myCourseRepository)	FindByID(ID int)(mycourses.MyCourse, error) {
+func(r *myCourseRepository)	FindAllByUserID(userID int)([]mycourses.MyCourse, error) {
+	var myCourse []mycourses.MyCourse
+	err := r.db.Where("user_id = ?", userID).Find(&myCourse).Error
+	if err != nil {
+		return myCourse, err
+	}
+
+	return myCourse, nil
+}
+
+func(r *myCourseRepository) CheckCourse(courseID int, userID int)(mycourses.MyCourse, error){
 	var myCourse mycourses.MyCourse
-	err := r.db.Where("id = ?", ID).Error
+	err := r.db.Where("course_id = ? ", courseID).Where("user_id = ?", userID).Find(&myCourse).Error
 	if err != nil {
 		return myCourse, err
 	}
@@ -37,6 +48,8 @@ func(r *myCourseRepository) Save(myCourse mycourses.MyCourse)(mycourses.MyCourse
 	}
 	return myCourse, nil
 }
+
+// kurang find one by user
 
 
 
