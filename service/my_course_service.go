@@ -9,6 +9,7 @@ type ServiceMyCourse interface {
 	GetAllMyCourse(userID int) ([]mycourses.MyCourse, error)
 	CreateMyCourse(input mycourses.CreateMyCourseInput, userID int)(mycourses.MyCourse, error)
 	IsExistMyCourse(input mycourses.CreateMyCourseInput, userID int)(mycourses.MyCourse, error)
+	CreatePremiumAccess(userID int, courseID int)(error)
 }
 
 type serviceMyCourse struct {
@@ -47,4 +48,18 @@ func(s *serviceMyCourse) IsExistMyCourse(input mycourses.CreateMyCourseInput, us
 		return mycourse, err
 	} 
 	return mycourse, nil
+}
+
+func(s *serviceMyCourse) CreatePremiumAccess(userID int, courseID int)(error){
+	mycourse := mycourses.MyCourse{}
+	mycourse.UserID = userID
+	mycourse.CourseID = courseID
+	
+	_, err := s.repositoryMyCourse.Save(mycourse)
+	if err != nil {
+		return err
+	}
+
+	return nil
+	
 }

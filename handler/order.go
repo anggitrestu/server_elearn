@@ -19,32 +19,37 @@ func NewOrderHandler(serviceOrder service.ServiceOrder)*orderHandler {
 	return &orderHandler{serviceOrder }
 }
 
-func(h *orderHandler)CreateOrder(c *gin.Context){
+// func(h *orderHandler)CreateOrder(c *gin.Context){
 
-	var inputData orders.CreateOrderInput
+// 	var inputData orders.CreateOrderInput
 	
+// 	err := c.ShouldBind(&inputData)
+// 	if err != nil {
+// 		errors := helper.FormatValidationError(err)
+// 		errorMessage := gin.H{"errors": errors}
 
-	err := c.ShouldBind(&inputData)
-	if err != nil {
-		errors := helper.FormatValidationError(err)
-		errorMessage := gin.H{"errors": errors}
+// 		response := helper.APIResponse("Failed to place an order", http.StatusUnprocessableEntity, "error", errorMessage)
+// 		c.JSON(http.StatusUnprocessableEntity, response)
+// 		return
+// 	}
+	 
+// 	order , err := h.serviceOrder.CreateOrder(inputData)
+// 	if err != nil {
+// 		response := helper.APIResponse("Create order failed", http.StatusBadRequest, "error", nil ) 
+// 		c.JSON(http.StatusBadRequest, response)
+// 		return
+// 	}
 
-		response := helper.APIResponse("Failed to place an order", http.StatusUnprocessableEntity, "error", errorMessage)
-		c.JSON(http.StatusUnprocessableEntity, response)
-		return
-	}
-	
-	newOrder , err := h.serviceOrder.CreateOrder(inputData)
-	if err != nil {
-		response := helper.APIResponse("Create order failed", http.StatusBadRequest, "error", err.Error() ) 
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
+// 	newOrder, err := h.serviceOrder.UpdateOrder(order.ID, inputData)
+// 	if err != nil {
+// 		response := helper.APIResponse("Create order failed", http.StatusBadRequest, "error", nil ) 
+// 		c.JSON(http.StatusBadRequest, response)
+// 		return
+// 	}
+// 	reponse := helper.APIResponse("Success create order", http.StatusOK, "success", newOrder)
+// 	c.JSON(http.StatusOK, reponse)
 
-	reponse := helper.APIResponse("Success create order", http.StatusOK, "success", newOrder)
-	c.JSON(http.StatusOK, reponse)
-
-}
+// }
 
 func(h *orderHandler) GetOrders(c *gin.Context){
 	currentUser := c.MustGet("currentUser").(users.User)
@@ -62,12 +67,27 @@ func(h *orderHandler) GetOrders(c *gin.Context){
 
 }
 
-
-func(h *orderHandler) Webhook(c *gin.Context){
-	buf := make([]byte, 1024)
-	num, _ := c.Request.Body.Read(buf)
-	reqBody := string(buf[0:num])
-
+func (h *orderHandler) Webhook(c *gin.Context) {
 	
-	c.JSON(http.StatusOK, reqBody)
+
+	var input orders.TransactionNotificationInput
+	
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.APIResponse("Failed to process notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	err = h.serviceOrder.ProcessOrder(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to process notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+
+	c.JSON(http.StatusOK, "ok")
 }

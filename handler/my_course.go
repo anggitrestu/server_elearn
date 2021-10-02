@@ -13,10 +13,12 @@ import (
 type myCourseHandler struct {
 	serviceMyCourse service.ServiceMyCourse
 	serviceCourse service.ServiceCourse
+	serviceUser service.ServiceUser
+	serviceOrder service.ServiceOrder
 }
 
-func NewMyCourseHandler(serviceMyCourse service.ServiceMyCourse, serviceCourse service.ServiceCourse)*myCourseHandler {
-	return &myCourseHandler{serviceMyCourse, serviceCourse}
+func NewMyCourseHandler(serviceMyCourse service.ServiceMyCourse, serviceCourse service.ServiceCourse, serviceUser service.ServiceUser, serviceOrder service.ServiceOrder)*myCourseHandler {
+	return &myCourseHandler{serviceMyCourse, serviceCourse, serviceUser, serviceOrder}
 }
 
 func(h *myCourseHandler) CreateMyCourse(c *gin.Context){
@@ -58,29 +60,49 @@ func(h *myCourseHandler) CreateMyCourse(c *gin.Context){
 		return
 	}
 
-	newMyCourse, err := h.serviceMyCourse.CreateMyCourse(input, userID)
-	if err != nil {
+
+
+	
+	if course.Type == "premium" {
+		if course.Price == 0 {
+					response := helper.APIResponse("Price Can't be 0", http.StatusMethodNotAllowed, "error", nil ) 
+					c.JSON(http.StatusBadRequest, response)
+					return
+		}
+			
+		order , err := h.serviceOrder.CreateOrder(currentUser, course)
+		if err != nil {
+			response := helper.APIResponse("Create order failed", http.StatusBadRequest, "error", nil ) 
+			c.JSON(http.StatusBadRequest, response)
+			return
+		}
+
+		newOrder, err := h.serviceOrder.UpdateOrder(order.ID, currentUser, course)
+		if err != nil {
+			response := helper.APIResponse("Create order failed", http.StatusBadRequest, "error", nil ) 
+			c.JSON(http.StatusBadRequest, response)
+			return
+		}
+		reponse := helper.APIResponse("Success create order", http.StatusOK, "success", newOrder)
+		c.JSON(http.StatusOK, reponse)
+	} else {
+		
+		newMyCourse, err := h.serviceMyCourse.CreateMyCourse(input, userID)
+		if err != nil {
 
 		response := helper.APIResponse("Create my course failed", http.StatusBadRequest, "error", nil ) 
 		c.JSON(http.StatusBadRequest, response)
 		return
+		}
+
+				
+		reponse := helper.APIResponse("Success create my course", http.StatusOK, "success", newMyCourse)
+		c.JSON(http.StatusOK, reponse)
+
 	}
 
-	reponse := helper.APIResponse("Success create my course", http.StatusOK, "success", newMyCourse)
-	c.JSON(http.StatusOK, reponse)
 
-
-
-	// if course.Type == "premium" {
-	// 	if course.Price == 0 {
-	// 		response := helper.APIResponse("Price Can't be 0", http.StatusMethodNotAllowed, "error", nil ) 
-	// 		c.JSON(http.StatusBadRequest, response)
-	// 		return
-	// 	}
-
-	// 	order := 
-	// }
-
+	
 }
 
 func(h *myCourseHandler) GetAllMyCourse(c *gin.Context) {
@@ -94,12 +116,13 @@ func(h *myCourseHandler) GetAllMyCourse(c *gin.Context) {
 		return
 	}
 
-	// if myCourse.ID == 0 {
-	// 	response := helper.APIResponse("course Not Found", http.StatusNotFound, "error", nil)
-	// 	c.JSON(http.StatusNotFound, response)
-	// 	return
-	// }
+	if len(myCourse) == 0 {
+		response := helper.APIResponse("you don't have a course", http.StatusOK, "success", nil)
+		c.JSON(http.StatusOK, response)
+		return
+	}
 	
 	response := helper.APIResponse("Success to get detail my course", http.StatusOK, "success", myCourse)
 	c.JSON(http.StatusOK, response)
 }
+
