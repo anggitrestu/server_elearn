@@ -2,7 +2,6 @@ package mentors
 
 // yang di create ke database
 import (
-	"server_elearn/models/courses"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,5 +16,4 @@ type Mentor struct {
 	CreatedAt      	time.Time		`json:"created_at"`
 	UpdatedAt      	time.Time		`json:"updated_at"`
 	DeletedAt 	   	gorm.DeletedAt	`gorm:"index" json:"deleted_at"`
-	Courses 		[]courses.Course `gorm:"foreignKey:MentorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

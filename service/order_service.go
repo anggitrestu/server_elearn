@@ -13,7 +13,7 @@ import (
 type ServiceOrder interface {
 	CreateOrder(user users.User, course courses.Course)(orders.Order, error)
 	GetOrders(userID int)([]orders.Order, error)
-	ProcessOrder(input orders.TransactionNotificationInput) error
+	ProcessOrder(input orders.TransactionNotificationInput) (orders.Order, error)
 	UpdateOrder(orderID int, user users.User, course courses.Course)(orders.Order, error)
 }
 
@@ -83,13 +83,13 @@ func(s *serviceOrder) GetOrders(userID int)([]orders.Order, error) {
 	return orders, nil
 }
 
-func (s *serviceOrder) ProcessOrder(input orders.TransactionNotificationInput) error {
+func (s *serviceOrder) ProcessOrder(input orders.TransactionNotificationInput) (orders.Order, error) {
 	realOrderID := strings.Split(input.OrderID, "-")
 	orderID,_ := strconv.Atoi(realOrderID[0])
 
 	order, err := s.repositoryOrder.GetByID(orderID)
 	if err != nil {
-		return err
+		return order, err
 	}
 
 	if input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
@@ -100,10 +100,10 @@ func (s *serviceOrder) ProcessOrder(input orders.TransactionNotificationInput) e
 		order.Status = "cancelled"
 	}
  
-	err = s.repositoryOrder.Update(order)
+	updateOrder, err := s.repositoryOrder.UpdateOrder(order)
 	if err != nil {
-		return err
+		return order, err
 	}
 
-	return nil
+	return updateOrder, nil
 }

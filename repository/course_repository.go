@@ -36,7 +36,7 @@ func(r *courseRepository) Save(course courses.Course)(courses.Course, error){
 
 func(r *courseRepository) FindByID(ID int)(courses.Course, error) {
 	var course courses.Course
-	err := r.db.Where("id = ?", ID).Preload("ImageCourses").Preload("Reviews").Preload("Chapters").Find(&course).Error
+	err := r.db.Where("id = ?", ID).Preload("Mentor").Preload("Chapters.Lessons").Preload("ImageCourses").Find(&course).Error
 	if err != nil  {
 		return course, err
 	}

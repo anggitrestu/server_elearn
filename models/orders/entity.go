@@ -1,7 +1,6 @@
 package orders
 
 import (
-	paymentlogs "server_elearn/models/payment_logs"
 	"time"
 
 	"gorm.io/datatypes"
@@ -18,7 +17,7 @@ type Order struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	PaymentLogs paymentlogs.PaymentLog `gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	// PaymentLogs paymentlogs.PaymentLog `gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type Metadata struct {

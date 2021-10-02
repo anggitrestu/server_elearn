@@ -38,7 +38,7 @@ func (r *chapterRepository) Save(chapter chapters.Chapter)(chapters.Chapter, err
 func(r *chapterRepository)FindByID(ID int)(chapters.Chapter, error) {
 	
 	var chapter chapters.Chapter
-	err := r.db.Where("id = ?", ID).Find(&chapter).Error
+	err := r.db.Where("id = ?", ID).Preload("Lessons").Find(&chapter).Error
 	if err != nil {
 		return chapter, err
 	}
