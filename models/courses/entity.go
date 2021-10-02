@@ -4,6 +4,7 @@ import (
 	"server_elearn/models/chapters"
 	imagecourses "server_elearn/models/image_courses"
 	"server_elearn/models/mycourses"
+
 	"server_elearn/models/orders"
 	"server_elearn/models/reviews"
 	"time"
@@ -30,7 +31,7 @@ type Course struct {
 	MyCourses 	[]mycourses.MyCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`	
 	ImageCourses []imagecourses.ImageCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`	
 	Reviews 	[]reviews.Review `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Orders			[]orders.Order `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Orders		[]orders.Order `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 }
 

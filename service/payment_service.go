@@ -1,7 +1,9 @@
 package service
 
 import (
-	"server_elearn/models/orders"
+	"fmt"
+	"server_elearn/models/courses"
+	"server_elearn/models/users"
 	"strconv"
 	"time"
 
@@ -12,18 +14,20 @@ type servicePayment struct {
 }
 
 type ServicePayment interface {
-	GetPaymentURL(data orders.CreateOrderInput) (string, error)
+	GetPaymentURL(orderID int, user users.User, course courses.Course) (string, error)
 }
 
 func NewServicePayment() *servicePayment {
 	return &servicePayment{}
 }
 
-func generateOrderID() string {
-	return strconv.FormatInt(time.Now().UnixNano(), 10)
+func generateOrderID(orderID int) string {
+	rand := strconv.FormatInt(time.Now().UnixNano(), 10)
+	path := fmt.Sprintf("%d-%s", orderID, rand) 
+	return path
 }
 
-func (s *servicePayment) GetPaymentURL(data orders.CreateOrderInput) (string, error) {
+func (s *servicePayment) GetPaymentURL(orderID int, user users.User, course courses.Course) (string, error) {
 	midclient := midtrans.NewClient()
 	midclient.ServerKey = "SB-Mid-server-m2OkDmszlvtFNFT6XDpW2dbA"
 	midclient.ClientKey =  "SB-Mid-client-t-V2YcQBWyf-JhN5"
@@ -35,12 +39,12 @@ func (s *servicePayment) GetPaymentURL(data orders.CreateOrderInput) (string, er
 
 	snapReq := &midtrans.SnapReq{
 		CustomerDetail: &midtrans.CustDetail{
-			Email: data.User.Email,
-			FName: data.User.Name,
+			Email:user.Email,
+			FName:user.Name,
 		},
 		TransactionDetails: midtrans.TransactionDetails{
-			OrderID: generateOrderID(),
-			GrossAmt: int64(data.Course.Price),
+			OrderID: generateOrderID(orderID),
+			GrossAmt: int64(course.Price),
 		},
 	}
 

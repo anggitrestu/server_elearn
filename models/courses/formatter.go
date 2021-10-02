@@ -5,6 +5,7 @@ package courses
 type CourseFormatter struct {
 	ID			int	   `json:"id"`
 	Name        string `json:"name"`
+	Thumbnail string `json:"thumbnail"`
 	Certificate bool   `json:"certificate"`
 	Type        string `json:"type"`
 	Status      string `json:"status"`
@@ -18,6 +19,7 @@ func FormatCourse(course Course) CourseFormatter {
 	formatter := CourseFormatter {
 		ID: course.ID,
 		Name: course.Name,
+		Thumbnail: course.Thumbnail,
 		Certificate: course.Certificate,
 		Type: course.Type,
 		Status: course.Status,

@@ -62,7 +62,7 @@ func main() {
 	lessonHandler := handler.NewLessonHandler(lessonService)
 	imageCourseHandler := handler.NewImageCourseHandler(imageCourseService, courseService)
 	reviewHandler := handler.NewReviewHandler(reviewService, courseService)
-	myCourseHandler := handler.NewMyCourseHandler(myCourseService, courseService)
+	myCourseHandler := handler.NewMyCourseHandler(myCourseService, courseService, userService, orderService)
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	router := gin.Default()
@@ -109,7 +109,7 @@ func main() {
 	api.POST("/my-courses", authMiddleware, myCourseHandler.CreateMyCourse)
 	api.GET("/my-courses", authMiddleware, myCourseHandler.GetAllMyCourse)
 	
-	api.POST("/order", authMiddleware,orderHandler.CreateOrder)
+	// api.POST("/order", authMiddleware,orderHandler.CreateOrder)
 	api.GET("/orders", authMiddleware,orderHandler.GetOrders)
 	api.POST("/webhook", orderHandler.Webhook)
 

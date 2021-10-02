@@ -2,13 +2,19 @@ package service
 
 import (
 	"encoding/json"
+	"server_elearn/models/courses"
 	"server_elearn/models/orders"
+	"server_elearn/models/users"
 	"server_elearn/repository"
+	"strconv"
+	"strings"
 )
 
 type ServiceOrder interface {
-	CreateOrder(input orders.CreateOrderInput)(orders.Order, error)
+	CreateOrder(user users.User, course courses.Course)(orders.Order, error)
 	GetOrders(userID int)([]orders.Order, error)
+	ProcessOrder(input orders.TransactionNotificationInput) error
+	UpdateOrder(orderID int, user users.User, course courses.Course)(orders.Order, error)
 }
 
 type serviceOrder struct {
@@ -20,29 +26,12 @@ func NewServiceOrder(repositoryOrder repository.OrderRepository, servicePayment 
 	return &serviceOrder{repositoryOrder, servicePayment}
 }
 
-func(s *serviceOrder) CreateOrder(input orders.CreateOrderInput)(orders.Order, error){
-
-	metadata := orders.Metadata {
-		Course_id : input.Course.ID,
-		Course_price : input.Course.Price,
-		Course_name : input.Course.Name,
-		Course_thumbnail : input.Course.Thumbnail,
-		Course_level : input.Course.Level,
-	}
-	
-	metadataToJson, _ := json.Marshal(metadata)
+func(s *serviceOrder) CreateOrder(user users.User, course courses.Course)(orders.Order, error){
 
 	order := orders.Order{}
-	order.Status = "pending"
-	order.CourseID = input.Course.ID
-	order.UserID = input.User.ID
-	order.Metadata = metadataToJson
-	paymentUrl , err := s.servicePayment.GetPaymentURL(input)
-	if err != nil {
-		return order, err
-	}
-	order.SnapURL = paymentUrl
-
+	order.CourseID = course.ID
+	order.UserID = user.ID
+	
 	newOrder , err := s.repositoryOrder.Save(order)
 	if err != nil {
 		return newOrder, err
@@ -50,6 +39,40 @@ func(s *serviceOrder) CreateOrder(input orders.CreateOrderInput)(orders.Order, e
 
 	return newOrder, nil
 }
+
+func(s *serviceOrder) UpdateOrder(orderID int, user users.User, course courses.Course)(orders.Order, error){
+	order, err := s.repositoryOrder.GetByID(orderID)
+	if err != nil {
+		return order, err
+	}
+	metadata := orders.Metadata {
+		Course_id : course.ID,
+		Course_price : course.Price,
+		Course_name : course.Name,
+		Course_thumbnail : course.Thumbnail,
+		Course_level : course.Level,
+	}
+	
+	metadataToJson, _ := json.Marshal(metadata)
+
+	order.Status = "pending"
+	order.CourseID = course.ID
+	order.UserID = user.ID
+	order.Metadata = metadataToJson
+	paymentUrl , err := s.servicePayment.GetPaymentURL(orderID, user, course)
+	if err != nil {
+		return order, err
+	}
+	order.SnapURL = paymentUrl
+
+	newOrder , err := s.repositoryOrder.UpdateOrder(order)
+	if err != nil {
+		return newOrder, err
+	}
+
+	return newOrder, nil
+}
+
 
 func(s *serviceOrder) GetOrders(userID int)([]orders.Order, error) {
 	orders , err := s.repositoryOrder.FindAllByUserID(userID)
@@ -60,43 +83,27 @@ func(s *serviceOrder) GetOrders(userID int)([]orders.Order, error) {
 	return orders, nil
 }
 
-// func (s *serviceOrder) ProcessPayment(input orders.TransactionNotificationInput) error {
-// 	transaction_id, _ := strconv.Atoi(input.OrderID)
+func (s *serviceOrder) ProcessOrder(input orders.TransactionNotificationInput) error {
+	realOrderID := strings.Split(input.OrderID, "-")
+	orderID,_ := strconv.Atoi(realOrderID[0])
 
-// 	transaction, err := s.repository.GetByID(transaction_id)
-// 	if err != nil {
-// 		return err
-// 	}
+	order, err := s.repositoryOrder.GetByID(orderID)
+	if err != nil {
+		return err
+	}
 
-// 	if input.PaymentType == "credit_card" && input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
-// 		transaction.Status = "paid"
-// 	} else if input.TransactionStatus == "settlement" {
-// 		transaction.Status = "paid"
-// 	} else if input.TransactionStatus == "deny" || input.TransactionStatus == "expire" || input.TransactionStatus == "cancel" {
-// 		transaction.Status = "cancelled"
-// 	}
+	if input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
+		order.Status = "success"
+	} else if input.TransactionStatus == "settlement" {
+		order.Status = "success"
+	} else if input.TransactionStatus == "deny" || input.TransactionStatus == "expire" || input.TransactionStatus == "cancel" {
+		order.Status = "cancelled"
+	}
+ 
+	err = s.repositoryOrder.Update(order)
+	if err != nil {
+		return err
+	}
 
-// 	updatedTransaction, err := s.repository.Update(transaction)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	campaign, err := s.campaignRepository.FindByID(updatedTransaction.CampaignID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	if updatedTransaction.Status == "paid" {
-// 		campaign.BackerCount = campaign.BackerCount + 1
-// 		campaign.CurrentAmount = campaign.CurrentAmount + updatedTransaction.Amount
-
-// 		_, err := s.campaignRepository.Update(campaign)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-
+	return nil
+}

@@ -10,7 +10,7 @@ type MyCourseRepository interface {
 	FindAllByUserID(userID int)([]mycourses.MyCourse, error)
 	CheckCourse(courseID int, userID int)(mycourses.MyCourse, error)
 	Save(myCourse mycourses.MyCourse)(mycourses.MyCourse, error)
-	// UpdateToPremium(mycou)
+
 }
 
 type myCourseRepository struct {
@@ -48,8 +48,6 @@ func(r *myCourseRepository) Save(myCourse mycourses.MyCourse)(mycourses.MyCourse
 	}
 	return myCourse, nil
 }
-
-// kurang find one by user
 
 
 
