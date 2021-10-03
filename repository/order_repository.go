@@ -10,7 +10,6 @@ type OrderRepository interface {
 	Save(order orders.Order)(orders.Order , error)
 	FindAllByUserID(userID int)([]orders.Order, error)
 	GetByID(ID int)(orders.Order, error)
-	Update(order orders.Order)(error)
 	UpdateOrder(order orders.Order)(orders.Order , error)
 }
 
@@ -57,10 +56,3 @@ func(r *orderRepository)GetByID(ID int)(orders.Order, error){
 	return order, nil
 }
 
-func(r *orderRepository)Update(order orders.Order)(error){
-	err := r.db.Save(&order).Error
-	if err != nil {
-		return err
-	}
-	return  nil
-}

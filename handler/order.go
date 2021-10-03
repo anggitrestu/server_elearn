@@ -12,11 +12,12 @@ import (
 
 type orderHandler struct {
 	serviceOrder service.ServiceOrder
+	serviceMyCourse service.ServiceMyCourse
 }
 
 
-func NewOrderHandler(serviceOrder service.ServiceOrder)*orderHandler {
-	return &orderHandler{serviceOrder }
+func NewOrderHandler(serviceOrder service.ServiceOrder, serviceMyCourse service.ServiceMyCourse)*orderHandler {
+	return &orderHandler{serviceOrder, serviceMyCourse }
 }
 
 // func(h *orderHandler)CreateOrder(c *gin.Context){
@@ -80,7 +81,8 @@ func (h *orderHandler) Webhook(c *gin.Context) {
 		return
 	}
 
-	err = h.serviceOrder.ProcessOrder(input)
+	// order, err = h.serviceOrder.ProcessOrder(input)
+	order, err := h.serviceOrder.ProcessOrder(input)
 	if err != nil {
 		response := helper.APIResponse("Failed to process notification", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -88,6 +90,16 @@ func (h *orderHandler) Webhook(c *gin.Context) {
 		return
 	}
 
+	
 
+	err = h.serviceMyCourse.CreatePremiumAccess(order.UserID, order.CourseID)
+	if err != nil {
+		response := helper.APIResponse("Failed to access premium", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+		
 	c.JSON(http.StatusOK, "ok")
+
 }

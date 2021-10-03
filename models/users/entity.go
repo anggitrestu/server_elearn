@@ -21,7 +21,7 @@ type User struct {
 	UpdatedAt      time.Time		`json:"updated_at"`
 	DeletedAt 	   gorm.DeletedAt	`gorm:"index" json:"deleted_at"`
 	MyCourses		[]mycourses.MyCourse	`gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Reviews 		[]reviews.Review `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Reviews 		[]reviews.Review `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `
 	Orders			[]orders.Order `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 }	

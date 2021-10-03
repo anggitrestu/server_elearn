@@ -96,7 +96,7 @@ func(h *myCourseHandler) CreateMyCourse(c *gin.Context){
 		}
 
 				
-		reponse := helper.APIResponse("Success create my course", http.StatusOK, "success", newMyCourse)
+		reponse := helper.APIResponse("Success create my course", http.StatusOK, "success", mycourses.FormatMyCourse(newMyCourse))
 		c.JSON(http.StatusOK, reponse)
 
 	}
@@ -122,7 +122,7 @@ func(h *myCourseHandler) GetAllMyCourse(c *gin.Context) {
 		return
 	}
 	
-	response := helper.APIResponse("Success to get detail my course", http.StatusOK, "success", myCourse)
+	response := helper.APIResponse("Success to get detail my course", http.StatusOK, "success", mycourses.FormatMyAllCourses(myCourse))
 	c.JSON(http.StatusOK, response)
 }
 

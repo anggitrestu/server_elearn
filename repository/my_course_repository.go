@@ -23,7 +23,7 @@ func NewMyCourseRepository(db *gorm.DB) *myCourseRepository {
 
 func(r *myCourseRepository)	FindAllByUserID(userID int)([]mycourses.MyCourse, error) {
 	var myCourse []mycourses.MyCourse
-	err := r.db.Where("user_id = ?", userID).Find(&myCourse).Error
+	err := r.db.Where("user_id = ?", userID).Preload("Course").Find(&myCourse).Error
 	if err != nil {
 		return myCourse, err
 	}

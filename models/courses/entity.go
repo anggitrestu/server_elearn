@@ -3,10 +3,9 @@ package courses
 import (
 	"server_elearn/models/chapters"
 	imagecourses "server_elearn/models/image_courses"
-	"server_elearn/models/mycourses"
-
-	"server_elearn/models/orders"
+	"server_elearn/models/mentors"
 	"server_elearn/models/reviews"
+
 	"time"
 
 	"gorm.io/gorm"
@@ -14,7 +13,7 @@ import (
 
 
 type Course struct {
-	ID          int            `gorm:"primaryKey"`
+	ID          int            `gorm:"primaryKey" json:"id"`
 	Name        string         `gorm:"size:256" json:"name"`
 	Certificate bool           `json:"certificate"`
 	Thumbnail   string         `gorm:"size:256" json:"thumbnail"`
@@ -27,11 +26,10 @@ type Course struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	Chapters 	[]chapters.Chapter `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	MyCourses 	[]mycourses.MyCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`	
-	ImageCourses []imagecourses.ImageCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`	
-	Reviews 	[]reviews.Review `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Orders		[]orders.Order `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-
+	Reviews 	[]reviews.Review  `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"reviews"`
+	Mentor		mentors.Mentor `gorm:"foreignKey:MentorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"mentor"`
+	Chapters 	[]chapters.Chapter `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chapters"`
+	ImageCourses []imagecourses.ImageCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"image_courses"`	
+	
 }
 

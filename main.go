@@ -11,7 +11,6 @@ import (
 	"server_elearn/models/mentors"
 	"server_elearn/models/mycourses"
 	"server_elearn/models/orders"
-	paymentlogs "server_elearn/models/payment_logs"
 	"server_elearn/models/reviews"
 	"server_elearn/models/users"
 	"server_elearn/repository"
@@ -23,10 +22,10 @@ import (
 )
 
 func main() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/server_elearn?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:root@tcp(127.0.0.1:3306)/db_elearn?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
-	db.AutoMigrate(&users.User{}, &mentors.Mentor{}, &lessons.Lesson{}, &mentors.Mentor{}, &courses.Course{},  &chapters.Chapter{}, &lessons.Lesson{}, mycourses.MyCourse{}, &imagecourses.ImageCourse{}, &reviews.Review{}, &orders.Order{}, &paymentlogs.PaymentLog{})
+	db.AutoMigrate(&users.User{}, &mentors.Mentor{}, &lessons.Lesson{}, &mentors.Mentor{}, &courses.Course{},  &chapters.Chapter{}, &lessons.Lesson{}, mycourses.MyCourse{}, &imagecourses.ImageCourse{}, &reviews.Review{}, &orders.Order{})
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -63,7 +62,7 @@ func main() {
 	imageCourseHandler := handler.NewImageCourseHandler(imageCourseService, courseService)
 	reviewHandler := handler.NewReviewHandler(reviewService, courseService)
 	myCourseHandler := handler.NewMyCourseHandler(myCourseService, courseService, userService, orderService)
-	orderHandler := handler.NewOrderHandler(orderService)
+	orderHandler := handler.NewOrderHandler(orderService, myCourseService)
 
 	router := gin.Default()
 
