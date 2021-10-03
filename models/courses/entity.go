@@ -4,6 +4,7 @@ import (
 	"server_elearn/models/chapters"
 	imagecourses "server_elearn/models/image_courses"
 	"server_elearn/models/mentors"
+	"server_elearn/models/reviews"
 
 	"time"
 
@@ -25,6 +26,7 @@ type Course struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	Reviews 	[]reviews.Review  `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"reviews"`
 	Mentor		mentors.Mentor `gorm:"foreignKey:MentorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"mentor"`
 	Chapters 	[]chapters.Chapter `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chapters"`
 	ImageCourses []imagecourses.ImageCourse `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"image_courses"`	
