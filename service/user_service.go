@@ -44,6 +44,7 @@ func(s *serviceUser) RegisterUser(input users.RegisterUserInput)(users.User, err
 	
 	newUser, err := s.repository.Save(user)
 
+
 	if err != nil {
 		return newUser, err
 	}
@@ -82,7 +83,7 @@ func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error)
 	}
 
 	
-	if user.ID == 0 {
+	if user.ID < 1 {
 		return true, nil
 	}
 
