@@ -9,17 +9,17 @@ on:
       - 'main'
 
 jobs:
-  # unit-test:
-  #   name: 'unit test'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Set up Go
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
-  #     - name: running unit test
-  #       run: go test ./... -cover
+  unit-test:
+    name: 'unit test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - name: running unit test
+        run: go test ./... -cover
 
   build-push-docker:
     name: 'Build image and push to registry'
