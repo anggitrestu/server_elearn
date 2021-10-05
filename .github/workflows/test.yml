@@ -1,0 +1,22 @@
+name: Running Unit Test, Build Docker Image,  Push To Docker Hub and Deploy To EC2
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  unit-test:
+    name: 'unit test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: running unit test
+        run: go test ./... -cover
