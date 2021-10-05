@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/spf13/viper"
 )
 
 type Service interface {
@@ -13,12 +12,12 @@ type Service interface {
 }
 
 type jwtService struct {
+	secretJWT       string
 }
 
-var SECRET_KEY = []byte(viper.GetString("jwt.SECRET_KEY"))
 
-func NewService() *jwtService {
-	return &jwtService{}
+func NewService(secretJWT string) *jwtService {
+	return &jwtService{secretJWT}
 }
 
 func (s *jwtService) GenerateToken(userID int) (string, error) {
@@ -27,7 +26,7 @@ func (s *jwtService) GenerateToken(userID int) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
-	signedToken, err := token.SignedString(SECRET_KEY)
+	signedToken, err := token.SignedString([]byte(s.secretJWT))
 	if err != nil {
 		return signedToken, err
 		
@@ -43,8 +42,8 @@ func (s *jwtService) ValidateToken(encodedToken string) (*jwt.Token, error) {
 		if !ok {
 			return nil, errors.New("invalid token")
 		}
-
-		return []byte(SECRET_KEY), nil
+		
+		return []byte(s.secretJWT), nil
 	})
 
 	if err != nil {
