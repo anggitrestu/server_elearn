@@ -1,0 +1,19 @@
+{
+  "jwt": {
+    "SECRET_KEY": "SECRET_KEY"
+  },
+  "debug": false,
+  "midtrans": {
+    "MIDTRANS_SERVER_KEY": "midtrans_server_key",
+    "MIDTRANS_CLIENT_KEY": "midtrans_client_key"
+  },
+  "databases": {
+    "mysql": {
+      "user": "dbusername",
+      "password": "dbpassword",
+      "host": "dbhost",
+      "dbname": "dbname",
+      "port": "port"
+    }
+  }
+}

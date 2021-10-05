@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"server_elearn/auth"
 	"server_elearn/handler"
@@ -14,22 +15,49 @@ import (
 	"server_elearn/models/reviews"
 	"server_elearn/models/users"
 	"server_elearn/repository"
+	"server_elearn/repository/drivers/mysql"
 	"server_elearn/service"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
-func main() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/db_elearn?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-	db.AutoMigrate(&users.User{}, &mentors.Mentor{}, &lessons.Lesson{}, &mentors.Mentor{}, &courses.Course{},  &chapters.Chapter{}, &lessons.Lesson{}, mycourses.MyCourse{}, &imagecourses.ImageCourse{}, &reviews.Review{}, &orders.Order{})
-
+func init() {
+	viper.SetConfigFile(`configs/config.json`)
+	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal(err.Error())
+		panic(err)
 	}
+	if viper.GetBool(`debug`) {
+		log.Println("Service RUN on DEBUG mode")
+	}
+}
+
+func DbMigrate(db *gorm.DB){
+	err := db.AutoMigrate(&users.User{}, &mentors.Mentor{}, &lessons.Lesson{}, &mentors.Mentor{}, &courses.Course{},  &chapters.Chapter{}, &lessons.Lesson{}, mycourses.MyCourse{}, &imagecourses.ImageCourse{}, &reviews.Review{}, &orders.Order{})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
+
+	mysqlConfig := mysql.ConfigDb {
+		DbUser:     viper.GetString(`databases.mysql.user`),
+		DbPassword: viper.GetString(`databases.mysql.password`),
+		DbHost:     viper.GetString(`databases.mysql.host`),
+		DbPort:     viper.GetString(`databases.mysql.port`),
+		DbName:     viper.GetString(`databases.mysql.dbname`),
+	}
+
+	db := mysqlConfig.InitialDb()
+	DbMigrate(db)
+	
+	configJWT := viper.GetString(`jwt.SECRET_KEY`)
+	fmt.Println(configJWT)
+	midtrans_client_key := viper.GetString(`midtrans.MIDTRANS_CLIENT_KEY`)
+	midtrans_server_key := viper.GetString(`midtrans.MIDTRANS_SERVER_KEY`)
 
 	userRepository := repository.NewUserRepository(db)
 	mentorRepository := repository.NewMentorRepository(db)
@@ -42,7 +70,7 @@ func main() {
 	orderRepository := repository.NewOrderRepository(db)
 
 	userService := service.NewServiceUser(userRepository)
-	authService := auth.NewService()
+	authService := auth.NewService(configJWT)
 	authMiddleware := auth.AuthMiddleware(authService, userService)
 	mentorService := service.NewServiceMentor(mentorRepository)
 	courseService := service.NewServiceCourse(courseRepository)
@@ -51,7 +79,7 @@ func main() {
 	imageCourseService := service.NewServiceImageCourse(imageCourseRepository)
 	reviewService := service.NewServiceReview(reviewRepository)
 	myCourseService := service.NewServiceMyCourse(myCourseRepository)
-	paymentService := service.NewServicePayment()
+	paymentService := service.NewServicePayment(midtrans_client_key, midtrans_server_key)
 	orderService := service.NewServiceOrder(orderRepository, *paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)

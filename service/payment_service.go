@@ -11,14 +11,16 @@ import (
 )
 
 type servicePayment struct {
+	MIDTRANS_CLIENT_KEY string
+	MIDTRANS_SERVER_KEY string
 }
 
 type ServicePayment interface {
 	GetPaymentURL(orderID int, user users.User, course courses.Course) (string, error)
 }
 
-func NewServicePayment() *servicePayment {
-	return &servicePayment{}
+func NewServicePayment(MIDTRANS_CLIENT_KEY string, MIDTRANS_SERVER_KEY string) *servicePayment {
+	return &servicePayment{MIDTRANS_CLIENT_KEY, MIDTRANS_SERVER_KEY}
 }
 
 func generateOrderID(orderID int) string {
@@ -29,8 +31,8 @@ func generateOrderID(orderID int) string {
 
 func (s *servicePayment) GetPaymentURL(orderID int, user users.User, course courses.Course) (string, error) {
 	midclient := midtrans.NewClient()
-	midclient.ServerKey = "SB-Mid-server-m2OkDmszlvtFNFT6XDpW2dbA"
-	midclient.ClientKey =  "SB-Mid-client-t-V2YcQBWyf-JhN5"
+	midclient.ServerKey = s.MIDTRANS_SERVER_KEY
+	midclient.ClientKey =  s.MIDTRANS_CLIENT_KEY
 	midclient.APIEnvType = midtrans.Sandbox
 
 	snapGateway := midtrans.SnapGateway{

@@ -10,6 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+
 type userHandler struct {
 	userService service.ServiceUser
 	authService auth.Service
@@ -55,12 +57,6 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 }
 
 func (h *userHandler) Login(c *gin.Context) {
-	// user memasukan input (email dan password)
-	// input ditangkap handler
-	// mappng dari input user ke input struct
-	// input struct passting service
-	// di service mencari dg bantuan rpository user dengan email
-	// mencocokan password
 
 	var input users.LoginInput
 	
@@ -78,7 +74,7 @@ func (h *userHandler) Login(c *gin.Context) {
 
 	if err != nil {
 		errorMessage := gin.H{"errors" : err.Error()}
-		response := helper.APIResponse("Login Failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.APIResponse(err.Error(), http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -86,7 +82,7 @@ func (h *userHandler) Login(c *gin.Context) {
 	token, err := h.authService.GenerateToken(loggedinUser.ID)
 
 	if err != nil {
-		response := helper.APIResponse("Login Failed",http.StatusBadRequest, "errors", nil)
+		response := helper.APIResponse(err.Error(),http.StatusBadRequest, "errors", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
