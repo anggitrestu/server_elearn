@@ -20,3 +20,12 @@ jobs:
           go-version: 1.17
       - name: running unit test
         run: go test ./... -cover
+
+  build-push-docker:
+    name: 'Build image and push to registry'
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+      - uses: actions/checkout@v2
+      - name: build docker
+        run: docker build -t moryku/kampus_merdeka:1.0.0 .
