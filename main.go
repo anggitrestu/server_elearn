@@ -138,8 +138,7 @@ func main() {
 	api.POST("/my-courses", authMiddleware, canAll, myCourseHandler.CreateMyCourse)
 	api.GET("/my-courses", authMiddleware, canAll, myCourseHandler.GetAllMyCourse)
 	
-	// api.POST("/order", authMiddleware,orderHandler.CreateOrder)
-	api.GET("/orders", authMiddleware,orderHandler.GetOrders)
+	api.GET("/orders", authMiddleware, orderHandler.GetOrders)
 	api.POST("/webhook", orderHandler.Webhook)
 
 
