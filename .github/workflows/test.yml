@@ -23,6 +23,10 @@ jobs:
 
   build-push-docker:
     name: 'Build image and push to registry'
+    name: configuration SSH
+    env:
+      CONFIG_JSON: ${{ secrets.CONFIG_JSON }}
+    run : echo "$CONFIG_JSON" > config.json
     runs-on: ubuntu-latest
     needs: unit-test
     steps:
