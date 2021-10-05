@@ -71,6 +71,7 @@ func (h *userHandler) Login(c *gin.Context) {
 	}
 
 	loggedinUser, err := h.userService.Login(input)
+	
 
 	if err != nil {
 		errorMessage := gin.H{"errors" : err.Error()}
@@ -171,7 +172,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 }
 
 func (h *userHandler) FetchUser(c *gin.Context){
-
+	
 	currentUser := c.MustGet("currentUser").(users.User)
 
 	formatter := users.FormatUser(currentUser, "")
