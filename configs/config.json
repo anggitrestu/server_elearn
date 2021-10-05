@@ -1,9 +1,19 @@
 {
   "jwt": {
-    "SECRET_KEY": "!*!*!*ElE4RN"
+    "SECRET_KEY": "S3erv3rElE4RN"
   },
+  "debug": false,
   "midtrans": {
     "MIDTRANS_SERVER_KEY": "SB-Mid-server-m2OkDmszlvtFNFT6XDpW2dbA",
     "MIDTRANS_CLIENT_KEY": "SB-Mid-client-t-V2YcQBWyf-JhN5"
+  },
+  "databases": {
+    "mysql": {
+      "user": "root",
+      "password": "root",
+      "host": "127.0.0.1",
+      "dbname": "db_elearn",
+      "port": "3306"
+    }
   }
 }

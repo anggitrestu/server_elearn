@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"server_elearn/auth"
 	"server_elearn/handler"
@@ -14,22 +15,49 @@ import (
 	"server_elearn/models/reviews"
 	"server_elearn/models/users"
 	"server_elearn/repository"
+	"server_elearn/repository/drivers/mysql"
 	"server_elearn/service"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
-func main() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/db_elearn?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-	db.AutoMigrate(&users.User{}, &mentors.Mentor{}, &lessons.Lesson{}, &mentors.Mentor{}, &courses.Course{},  &chapters.Chapter{}, &lessons.Lesson{}, mycourses.MyCourse{}, &imagecourses.ImageCourse{}, &reviews.Review{}, &orders.Order{})
-
+func init() {
+	viper.SetConfigFile(`configs/config.json`)
+	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal(err.Error())
+		panic(err)
 	}
+	if viper.GetBool(`debug`) {
+		log.Println("Service RUN on DEBUG mode")
+	}
+}
+
+func DbMigrate(db *gorm.DB){
+	err := db.AutoMigrate(&users.User{}, &mentors.Mentor{}, &lessons.Lesson{}, &mentors.Mentor{}, &courses.Course{},  &chapters.Chapter{}, &lessons.Lesson{}, mycourses.MyCourse{}, &imagecourses.ImageCourse{}, &reviews.Review{}, &orders.Order{})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
+
+	mysqlConfig := mysql.ConfigDb {
+		DbUser:     viper.GetString(`databases.mysql.user`),
+		DbPassword: viper.GetString(`databases.mysql.password`),
+		DbHost:     viper.GetString(`databases.mysql.host`),
+		DbPort:     viper.GetString(`databases.mysql.port`),
+		DbName:     viper.GetString(`databases.mysql.dbname`),
+	}
+
+	db := mysqlConfig.InitialDb()
+	DbMigrate(db)
+	
+	configJWT := viper.GetString(`jwt.SECRET_KEY`)
+	fmt.Println(configJWT)
+	midtrans_client_key := viper.GetString(`midtrans.MIDTRANS_CLIENT_KEY`)
+	midtrans_server_key := viper.GetString(`midtrans.MIDTRANS_SERVER_KEY`)
 
 	userRepository := repository.NewUserRepository(db)
 	mentorRepository := repository.NewMentorRepository(db)
@@ -42,8 +70,10 @@ func main() {
 	orderRepository := repository.NewOrderRepository(db)
 
 	userService := service.NewServiceUser(userRepository)
-	authService := auth.NewService()
+	authService := auth.NewService(configJWT)
 	authMiddleware := auth.AuthMiddleware(authService, userService)
+	canAdmin := auth.Permission(&auth.Role{Roles: []string{"admin"}})
+	canAll := auth.Permission(&auth.Role{Roles: []string{"admin", "student"}})
 	mentorService := service.NewServiceMentor(mentorRepository)
 	courseService := service.NewServiceCourse(courseRepository)
 	chapterService := service.NewServiceChapter(chapterRepository)
@@ -51,7 +81,7 @@ func main() {
 	imageCourseService := service.NewServiceImageCourse(imageCourseRepository)
 	reviewService := service.NewServiceReview(reviewRepository)
 	myCourseService := service.NewServiceMyCourse(myCourseRepository)
-	paymentService := service.NewServicePayment()
+	paymentService := service.NewServicePayment(midtrans_client_key, midtrans_server_key)
 	orderService := service.NewServiceOrder(orderRepository, *paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
@@ -71,45 +101,44 @@ func main() {
 	api.POST("/users/register", userHandler.RegisterUser)
 	api.POST("/users/login", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvaibility)
-	api.POST("/avatars", authMiddleware, userHandler.UploadAvatar)
+	api.POST("/avatars", authMiddleware,  userHandler.UploadAvatar)
 	api.GET("/users/fetch", authMiddleware, userHandler.FetchUser)
 
-	api.POST("/mentors", authMiddleware, mentorHandler.AddMentor)
-	api.GET("/mentors/:id", mentorHandler.GetMentor)
-	api.GET("/mentors", authMiddleware, mentorHandler.GetListMentor)
-	api.PUT("/mentors/:id",authMiddleware, mentorHandler.UpdateMentor)
-	api.DELETE("/mentors/:id",authMiddleware, mentorHandler.DeleteMentor)
+	api.POST("/mentors", authMiddleware, canAdmin, mentorHandler.AddMentor)
+	api.GET("/mentors/:id",  mentorHandler.GetMentor)
+	api.GET("/mentors",   mentorHandler.GetListMentor)
+	api.PUT("/mentors/:id",authMiddleware, canAdmin, mentorHandler.UpdateMentor)
+	api.DELETE("/mentors/:id",authMiddleware, canAdmin, mentorHandler.DeleteMentor)
 
-	api.POST("/courses",authMiddleware, courseHandler.CreateCourse)
-	api.GET("/courses/:id", courseHandler.GetCourse)
+	api.POST("/courses", authMiddleware, canAdmin, courseHandler.CreateCourse)
+	api.GET("/courses/:id",  courseHandler.GetCourse)
 	api.GET("/courses", courseHandler.GetCourses)
-	api.PUT("/courses/:id",authMiddleware, courseHandler.UpdateCourse)
-	api.DELETE("/courses/:id", authMiddleware, courseHandler.DeleteCourse)
+	api.PUT("/courses/:id",authMiddleware, canAdmin, courseHandler.UpdateCourse)
+	api.DELETE("/courses/:id", authMiddleware, canAdmin, courseHandler.DeleteCourse)
 
-	api.POST("/chapters", authMiddleware,chapterHandler.CreateChapter)
+	api.POST("/chapters", authMiddleware, canAdmin, chapterHandler.CreateChapter)
 	api.GET("/chapters/:id", chapterHandler.GetChapter)
 	api.GET("/chapters", chapterHandler.GetChapters)
-	api.PUT("/chapters/:id",authMiddleware, chapterHandler.UpdateChapter)
-	api.DELETE("/chapters/:id", authMiddleware, chapterHandler.DeleteChapter)
+	api.PUT("/chapters/:id",authMiddleware, canAdmin, chapterHandler.UpdateChapter)
+	api.DELETE("/chapters/:id", authMiddleware, canAdmin, chapterHandler.DeleteChapter)
 
-	api.POST("/lessons",authMiddleware, lessonHandler.CreateLesson)
+	api.POST("/lessons",authMiddleware, canAdmin, lessonHandler.CreateLesson)
 	api.GET("/lessons/:id", lessonHandler.GetLesson)
 	api.GET("/lessons", lessonHandler.GetLessons)
-	api.PUT("/lessons/:id",authMiddleware, lessonHandler.UpdateLesson)
-	api.DELETE("/lessons/:id",authMiddleware, lessonHandler.DeleteLesson)
+	api.PUT("/lessons/:id",authMiddleware, canAdmin, lessonHandler.UpdateLesson)
+	api.DELETE("/lessons/:id",authMiddleware,canAdmin, lessonHandler.DeleteLesson)
 
-	api.POST("/image-courses",authMiddleware, imageCourseHandler.CreateImageCourse)
-	api.DELETE("/image-courses/:id", authMiddleware, imageCourseHandler.DeleteImageCourse)
+	api.POST("/image-courses",authMiddleware, canAdmin, imageCourseHandler.CreateImageCourse)
+	api.DELETE("/image-courses/:id", authMiddleware, canAdmin, imageCourseHandler.DeleteImageCourse)
 
-	api.POST("/reviews", authMiddleware, reviewHandler.CreateReview)
-	api.PUT("/reviews/:id", authMiddleware, reviewHandler.UpdateReview)
-	api.DELETE("/reviews/:id", authMiddleware, reviewHandler.DeleteReview)
+	api.POST("/reviews", authMiddleware, canAll, reviewHandler.CreateReview)
+	api.PUT("/reviews/:id", authMiddleware, canAll, reviewHandler.UpdateReview)
+	api.DELETE("/reviews/:id", authMiddleware, canAll, reviewHandler.DeleteReview)
 
-	api.POST("/my-courses", authMiddleware, myCourseHandler.CreateMyCourse)
-	api.GET("/my-courses", authMiddleware, myCourseHandler.GetAllMyCourse)
+	api.POST("/my-courses", authMiddleware, canAll, myCourseHandler.CreateMyCourse)
+	api.GET("/my-courses", authMiddleware, canAll, myCourseHandler.GetAllMyCourse)
 	
-	// api.POST("/order", authMiddleware,orderHandler.CreateOrder)
-	api.GET("/orders", authMiddleware,orderHandler.GetOrders)
+	api.GET("/orders", authMiddleware, orderHandler.GetOrders)
 	api.POST("/webhook", orderHandler.Webhook)
 
 
