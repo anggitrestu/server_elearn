@@ -28,5 +28,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: build docker
-         run: docker build -t anggitrestu/:1.0.0 .
+         run: docker build -t anggitrestu/elearn:1.0.0 .
 
