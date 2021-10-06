@@ -27,10 +27,10 @@ jobs:
     needs: unit-test
     steps:
       - uses: actions/checkout@v2
-      # - name: add file config.json
-      #   env:
-      #     CONFIG_JSON: ${{ secrets.CONFIG_JSON }}
-      #   run: echo "$CONFIG_JSON" > config.json
+      - name: add file config.json
+        env:
+          CONFIG_JSON: ${{ secrets.CONFIG_JSON }}
+        run: echo "$CONFIG_JSON" > config.json
       - name: build docker
         run: docker build -t anggitrestu/elearn:1.0.1 .
       - name: login registry docker hub
