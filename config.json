@@ -9,9 +9,9 @@
   },
   "databases": {
     "mysql": {
-      "user": "root",
-      "password": "root",
-      "host": "127.0.0.1",
+      "user": "admin",
+      "password": "Ojolali18",
+      "host": "db-elearn.cbpvuoyrj3su.us-east-2.rds.amazonaws.com",
       "dbname": "db_elearn",
       "port": "3306"
     }
