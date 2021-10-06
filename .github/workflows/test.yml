@@ -63,5 +63,5 @@ jobs:
             IdentityFile ~/.ssh/Ojolali.pem
             StrictHostKeyChecking=no
           END
-      - name: Connect EC2 & Remove All Container & Pull from Registry & Start Container
+      - name: Connect EC2 & Remove All Container & Pull from Registry & Start
         run: ssh development 'docker rm -f $(docker ps -a -q) && docker pull anggitrestu/elearn:1.0.0 && docker run -d -p 8080:8080 --name elearn_container anggitrestu/elearn:1.0.0'
