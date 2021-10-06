@@ -28,6 +28,7 @@ func(s *serviceCourse) CreateCourse(input courses.CreateCourseInput)(courses.Cou
 	course.Name = input.Name
 	course.Certificate = input.Certificate
 	course.Type = input.Type
+	course.Price = input.Price
 	course.Status = input.Status
 	course.Level = input.Level
 	course.Description = input.Description 

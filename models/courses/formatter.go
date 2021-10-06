@@ -7,6 +7,7 @@ type CourseFormatter struct {
 	Name        string `json:"name"`
 	Thumbnail string `json:"thumbnail"`
 	Certificate bool   `json:"certificate"`
+	Price 		int 	`json:"price"`
 	Type        string `json:"type"`
 	Status      string `json:"status"`
 	Level       string `json:"level" `
@@ -21,6 +22,7 @@ func FormatCourse(course Course) CourseFormatter {
 		Name: course.Name,
 		Thumbnail: course.Thumbnail,
 		Certificate: course.Certificate,
+		Price: course.Price,
 		Type: course.Type,
 		Status: course.Status,
 		Level: course.Level,

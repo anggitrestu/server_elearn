@@ -4,6 +4,7 @@ type CreateCourseInput struct {
 	Name        string `json:"name" `
 	Certificate bool   `json:"certificate"`
 	Type        string `json:"type"`
+	Price 		int 	`json:"price"`
 	Status      string `json:"status"`
 	Level       string `json:"level" `
 	Description string `json:"description"`
