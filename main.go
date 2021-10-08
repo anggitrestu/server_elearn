@@ -141,6 +141,11 @@ func main() {
 	api.GET("/orders", authMiddleware, orderHandler.GetOrders)
 	api.POST("/webhook", orderHandler.Webhook)
 
+	// opts := middleware.RedocOpts{SpecURL: "./swagger.yaml"}
+	// sh := middleware.Redoc(opts, nil)
+	
+	// api.GET("/docs", )
+	// api.GET("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	router.Run()
 
