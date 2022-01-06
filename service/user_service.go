@@ -14,10 +14,10 @@ import (
 // mewakili binis logic, kata kerja
 type ServiceUser interface {
 	RegisterUser(input users.RegisterUserInput) (users.User, error)
-	Login(input users.LoginInput)(users.User, error)
-	IsEmailAvailable(input users.CheckEmailInput)(bool, error)
-	SaveAvatar(ID int, fileLocation string)(users.User, error)
-	GetUserByID(ID int)(users.User, error)
+	Login(input users.LoginInput) (users.User, error)
+	IsEmailAvailable(input users.CheckEmailInput) (bool, error)
+	SaveAvatar(ID int, fileLocation string) (users.User, error)
+	GetUserByID(ID int) (users.User, error)
 }
 
 type serviceUser struct {
@@ -28,22 +28,21 @@ func NewServiceUser(repository repository.UserRepository) *serviceUser {
 	return &serviceUser{repository}
 }
 
-func(s *serviceUser) RegisterUser(input users.RegisterUserInput)(users.User, error){
+func (s *serviceUser) RegisterUser(input users.RegisterUserInput) (users.User, error) {
 	// s.repository.Save(user)
 	user := users.User{}
 	user.Name = input.Name
-	user.Email  = input.Email
+	user.Email = input.Email
 	user.Profession = input.Profession
 	password, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
-	
+
 	if err != nil {
 		return user, err
 	}
 	user.Password = string(password)
 	user.Role = "student"
-	
-	newUser, err := s.repository.Save(user)
 
+	newUser, err := s.repository.Save(user)
 
 	if err != nil {
 		return newUser, err
@@ -74,7 +73,7 @@ func (s *serviceUser) Login(input users.LoginInput) (users.User, error) {
 
 }
 
-func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error){
+func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput) (bool, error) {
 	email := input.Email
 
 	user, err := s.repository.FindByEmail(email)
@@ -82,7 +81,6 @@ func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error)
 		return false, err
 	}
 
-	
 	if user.ID < 1 {
 		return true, nil
 	}
@@ -91,10 +89,9 @@ func (s *serviceUser) IsEmailAvailable(input users.CheckEmailInput)(bool, error)
 
 }
 
-
-func (s *serviceUser) SaveAvatar(ID int, fileLocation string)(users.User, error) {
+func (s *serviceUser) SaveAvatar(ID int, fileLocation string) (users.User, error) {
 	user, err := s.repository.FindById(ID)
-	
+
 	if err != nil {
 		return user, err
 	}
@@ -111,7 +108,7 @@ func (s *serviceUser) SaveAvatar(ID int, fileLocation string)(users.User, error)
 
 }
 
-func(s *serviceUser) GetUserByID(ID int)(users.User, error) {
+func (s *serviceUser) GetUserByID(ID int) (users.User, error) {
 	user, err := s.repository.FindById(ID)
 	if err != nil {
 		return user, err
@@ -120,6 +117,6 @@ func(s *serviceUser) GetUserByID(ID int)(users.User, error) {
 	if user.ID == 0 {
 		return user, errors.New("no user found with that ID")
 	}
-	 return user, nil
+	return user, nil
 
 }

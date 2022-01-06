@@ -7,12 +7,12 @@ import (
 )
 
 type CourseRepository interface {
-	Save(course courses.Course)(courses.Course, error)
-	FindByID(ID int)(courses.Course, error)
-	FindAll()([]courses.Course, error)
-	Update(course courses.Course)(courses.Course, error)
-	Delete(ID int)(courses.Course, error)
- 	FindByCourseID(ID int)(courses.Course, error)
+	Save(course courses.Course) (courses.Course, error)
+	FindByID(ID int) (courses.Course, error)
+	FindAll() ([]courses.Course, error)
+	Update(course courses.Course) (courses.Course, error)
+	Delete(ID int) (courses.Course, error)
+	FindByCourseID(ID int) (courses.Course, error)
 }
 
 type courseRepository struct {
@@ -23,8 +23,8 @@ func NewCourseRepository(db *gorm.DB) *courseRepository {
 	return &courseRepository{db}
 }
 
-func(r *courseRepository) Save(course courses.Course)(courses.Course, error){
-	
+func (r *courseRepository) Save(course courses.Course) (courses.Course, error) {
+
 	err := r.db.Create(&course).Error
 	if err != nil {
 		return course, err
@@ -34,17 +34,16 @@ func(r *courseRepository) Save(course courses.Course)(courses.Course, error){
 
 }
 
-func(r *courseRepository) FindByID(ID int)(courses.Course, error) {
+func (r *courseRepository) FindByID(ID int) (courses.Course, error) {
 	var course courses.Course
 	err := r.db.Where("id = ?", ID).Preload("Mentor").Preload("Chapters.Lessons").Preload("ImageCourses").Preload("Reviews").Find(&course).Error
-	if err != nil  {
+	if err != nil {
 		return course, err
 	}
 	return course, nil
 }
 
-
-func(r *courseRepository) Update(course courses.Course)(courses.Course, error) {
+func (r *courseRepository) Update(course courses.Course) (courses.Course, error) {
 	err := r.db.Save(&course).Error
 	if err != nil {
 		return course, err
@@ -53,7 +52,7 @@ func(r *courseRepository) Update(course courses.Course)(courses.Course, error) {
 	return course, nil
 }
 
-func(r *courseRepository) FindAll()([]courses.Course, error){
+func (r *courseRepository) FindAll() ([]courses.Course, error) {
 	var courses []courses.Course
 	err := r.db.Find(&courses).Error
 	if err != nil {
@@ -63,7 +62,7 @@ func(r *courseRepository) FindAll()([]courses.Course, error){
 	return courses, err
 }
 
-func (r *courseRepository) Delete(ID int)(courses.Course, error) {
+func (r *courseRepository) Delete(ID int) (courses.Course, error) {
 	course := courses.Course{}
 	err := r.db.Where("id = ?", ID).Delete(&course).Error
 	if err != nil {
@@ -73,7 +72,7 @@ func (r *courseRepository) Delete(ID int)(courses.Course, error) {
 	return course, nil
 }
 
-func (r *courseRepository) FindByCourseID(ID int)(courses.Course, error) {
+func (r *courseRepository) FindByCourseID(ID int) (courses.Course, error) {
 
 	var course courses.Course
 	err := r.db.Where("id = ?", ID).Find(&course).Error

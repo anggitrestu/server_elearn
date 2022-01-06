@@ -10,7 +10,7 @@
   "databases": {
     "mysql": {
       "user": "root",
-      "password": "root",
+      "password": "",
       "host": "127.0.0.1",
       "dbname": "db_elearn",
       "port": "3306"

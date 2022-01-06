@@ -7,13 +7,13 @@ import (
 )
 
 type ChapterRepository interface {
-	Save(chapter chapters.Chapter)(chapters.Chapter, error)
-	FindByCourseID(courseID int)([]chapters.Chapter, error)
-	FindByID(ID int)(chapters.Chapter, error)
-	FindAll()([]chapters.Chapter,error)
-	Update(chapter chapters.Chapter)(chapters.Chapter, error)
-	Delete(ID int)(bool, error)
-	CheckChapterByID(chapterID int)(chapters.Chapter, error)
+	Save(chapter chapters.Chapter) (chapters.Chapter, error)
+	FindByCourseID(courseID int) ([]chapters.Chapter, error)
+	FindByID(ID int) (chapters.Chapter, error)
+	FindAll() ([]chapters.Chapter, error)
+	Update(chapter chapters.Chapter) (chapters.Chapter, error)
+	Delete(ID int) (bool, error)
+	CheckChapterByID(chapterID int) (chapters.Chapter, error)
 }
 
 type chapterRepository struct {
@@ -24,7 +24,7 @@ func NewChapterRepository(db *gorm.DB) *chapterRepository {
 	return &chapterRepository{db}
 }
 
-func (r *chapterRepository) Save(chapter chapters.Chapter)(chapters.Chapter, error) {
+func (r *chapterRepository) Save(chapter chapters.Chapter) (chapters.Chapter, error) {
 
 	err := r.db.Create(&chapter).Error
 	if err != nil {
@@ -35,8 +35,8 @@ func (r *chapterRepository) Save(chapter chapters.Chapter)(chapters.Chapter, err
 
 }
 
-func(r *chapterRepository)FindByID(ID int)(chapters.Chapter, error) {
-	
+func (r *chapterRepository) FindByID(ID int) (chapters.Chapter, error) {
+
 	var chapter chapters.Chapter
 	err := r.db.Where("id = ?", ID).Preload("Lessons").Find(&chapter).Error
 	if err != nil {
@@ -46,7 +46,7 @@ func(r *chapterRepository)FindByID(ID int)(chapters.Chapter, error) {
 	return chapter, nil
 }
 
-func(r *chapterRepository)FindAll()([]chapters.Chapter,error){
+func (r *chapterRepository) FindAll() ([]chapters.Chapter, error) {
 	var chapters []chapters.Chapter
 	err := r.db.Find(&chapters).Error
 	if err != nil {
@@ -55,7 +55,7 @@ func(r *chapterRepository)FindAll()([]chapters.Chapter,error){
 	return chapters, nil
 }
 
-func(r *chapterRepository)FindByCourseID(courseID int)([]chapters.Chapter, error){
+func (r *chapterRepository) FindByCourseID(courseID int) ([]chapters.Chapter, error) {
 	var chapters []chapters.Chapter
 
 	err := r.db.Where("course_id = ? ", courseID).Preload("Lessons").Find(&chapters).Error
@@ -65,7 +65,7 @@ func(r *chapterRepository)FindByCourseID(courseID int)([]chapters.Chapter, error
 	return chapters, nil
 }
 
-func(r *chapterRepository)Update(chapter chapters.Chapter)(chapters.Chapter, error) {
+func (r *chapterRepository) Update(chapter chapters.Chapter) (chapters.Chapter, error) {
 	err := r.db.Save(&chapter).Error
 	if err != nil {
 		return chapter, err
@@ -74,7 +74,7 @@ func(r *chapterRepository)Update(chapter chapters.Chapter)(chapters.Chapter, err
 	return chapter, nil
 }
 
-func(r *chapterRepository) Delete(ID int)(bool, error) {
+func (r *chapterRepository) Delete(ID int) (bool, error) {
 	chapter := chapters.Chapter{}
 	err := r.db.Where("id = ?", ID).Delete(&chapter).Error
 	if err != nil {
@@ -84,7 +84,7 @@ func(r *chapterRepository) Delete(ID int)(bool, error) {
 	return true, nil
 }
 
-func(r *chapterRepository) CheckChapterByID(chapterID int)(chapters.Chapter, error) {
+func (r *chapterRepository) CheckChapterByID(chapterID int) (chapters.Chapter, error) {
 	var chapter chapters.Chapter
 	err := r.db.Where("id = ?", chapterID).Find(&chapter).Error
 	if err != nil {

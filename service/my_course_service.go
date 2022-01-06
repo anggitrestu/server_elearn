@@ -7,20 +7,20 @@ import (
 
 type ServiceMyCourse interface {
 	GetAllMyCourse(userID int) ([]mycourses.MyCourse, error)
-	CreateMyCourse(input mycourses.CreateMyCourseInput, userID int)(mycourses.MyCourse, error)
-	IsExistMyCourse(input mycourses.CreateMyCourseInput, userID int)(mycourses.MyCourse, error)
-	CreatePremiumAccess(userID int, courseID int)(error)
+	CreateMyCourse(input mycourses.CreateMyCourseInput, userID int) (mycourses.MyCourse, error)
+	IsExistMyCourse(input mycourses.CreateMyCourseInput, userID int) (mycourses.MyCourse, error)
+	CreatePremiumAccess(userID int, courseID int) error
 }
 
 type serviceMyCourse struct {
 	repositoryMyCourse repository.MyCourseRepository
 }
 
-func NewServiceMyCourse(repositoryMyCourse repository.MyCourseRepository)*serviceMyCourse {
+func NewServiceMyCourse(repositoryMyCourse repository.MyCourseRepository) *serviceMyCourse {
 	return &serviceMyCourse{repositoryMyCourse}
 }
 
-func(s *serviceMyCourse) CreateMyCourse(input mycourses.CreateMyCourseInput, userID int)(mycourses.MyCourse, error){
+func (s *serviceMyCourse) CreateMyCourse(input mycourses.CreateMyCourseInput, userID int) (mycourses.MyCourse, error) {
 	mycourse := mycourses.MyCourse{}
 	mycourse.UserID = userID
 	mycourse.CourseID = input.CourseID
@@ -34,7 +34,7 @@ func(s *serviceMyCourse) CreateMyCourse(input mycourses.CreateMyCourseInput, use
 
 }
 
-func(s *serviceMyCourse) GetAllMyCourse(userID int) ([]mycourses.MyCourse, error) {
+func (s *serviceMyCourse) GetAllMyCourse(userID int) ([]mycourses.MyCourse, error) {
 	mycourse, err := s.repositoryMyCourse.FindAllByUserID(userID)
 	if err != nil {
 		return mycourse, err
@@ -42,24 +42,24 @@ func(s *serviceMyCourse) GetAllMyCourse(userID int) ([]mycourses.MyCourse, error
 	return mycourse, nil
 }
 
-func(s *serviceMyCourse) IsExistMyCourse(input mycourses.CreateMyCourseInput, userID int)(mycourses.MyCourse, error){
+func (s *serviceMyCourse) IsExistMyCourse(input mycourses.CreateMyCourseInput, userID int) (mycourses.MyCourse, error) {
 	mycourse, err := s.repositoryMyCourse.CheckCourse(input.CourseID, userID)
 	if err != nil {
 		return mycourse, err
-	} 
+	}
 	return mycourse, nil
 }
 
-func(s *serviceMyCourse) CreatePremiumAccess(userID int, courseID int)(error){
+func (s *serviceMyCourse) CreatePremiumAccess(userID int, courseID int) error {
 	mycourse := mycourses.MyCourse{}
 	mycourse.UserID = userID
 	mycourse.CourseID = courseID
-	
+
 	_, err := s.repositoryMyCourse.Save(mycourse)
 	if err != nil {
 		return err
 	}
 
 	return nil
-	
+
 }

@@ -6,12 +6,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-
 type MockUserRepository struct {
 	mock.Mock
 }
 
-func(_m *MockUserRepository)Save(user users.User)(users.User, error){
+func (_m *MockUserRepository) Save(user users.User) (users.User, error) {
 	ret := _m.Called(user)
 
 	var r0 users.User
@@ -21,7 +20,7 @@ func(_m *MockUserRepository)Save(user users.User)(users.User, error){
 		r0 = ret.Get(0).(users.User)
 	}
 	var r1 error
-	if rf, ok := ret.Get(1).(func(users.User)error); ok {
+	if rf, ok := ret.Get(1).(func(users.User) error); ok {
 		r1 = rf(user)
 	} else {
 		r1 = ret.Error(1)
@@ -30,8 +29,8 @@ func(_m *MockUserRepository)Save(user users.User)(users.User, error){
 	return r0, r1
 }
 
-func(_m *MockUserRepository)FindByEmail(email string) (users.User, error){
-	
+func (_m *MockUserRepository) FindByEmail(email string) (users.User, error) {
+
 	ret := _m.Called(email)
 
 	var r0 users.User
@@ -41,7 +40,7 @@ func(_m *MockUserRepository)FindByEmail(email string) (users.User, error){
 		r0 = ret.Get(0).(users.User)
 	}
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string)error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(email)
 	} else {
 		r1 = ret.Error(1)
@@ -50,7 +49,7 @@ func(_m *MockUserRepository)FindByEmail(email string) (users.User, error){
 	return r0, r1
 }
 
-func(_m *MockUserRepository)FindById(ID int)(users.User, error){
+func (_m *MockUserRepository) FindById(ID int) (users.User, error) {
 
 	ret := _m.Called(ID)
 
@@ -61,7 +60,7 @@ func(_m *MockUserRepository)FindById(ID int)(users.User, error){
 		r0 = ret.Get(0).(users.User)
 	}
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int)error); ok {
+	if rf, ok := ret.Get(1).(func(int) error); ok {
 		r1 = rf(ID)
 	} else {
 		r1 = ret.Error(1)
@@ -70,8 +69,7 @@ func(_m *MockUserRepository)FindById(ID int)(users.User, error){
 	return r0, r1
 }
 
-
-func(_m *MockUserRepository)Update(user users.User)(users.User, error){
+func (_m *MockUserRepository) Update(user users.User) (users.User, error) {
 	ret := _m.Called(user)
 
 	var r0 users.User
@@ -81,7 +79,7 @@ func(_m *MockUserRepository)Update(user users.User)(users.User, error){
 		r0 = ret.Get(0).(users.User)
 	}
 	var r1 error
-	if rf, ok := ret.Get(1).(func(users.User)error); ok {
+	if rf, ok := ret.Get(1).(func(users.User) error); ok {
 		r1 = rf(user)
 	} else {
 		r1 = ret.Error(1)
